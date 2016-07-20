@@ -1,0 +1,106 @@
+// Purpose: Fill jet physics analysis histograms
+// Author:  mikko.voutilainen@cern.ch
+// Created: March 20, 2010
+// Updated: June 1, 2015
+
+// void mk_fillHistos() {
+{
+    // gROOT->ProcessLine(".exception");
+
+    // Jet energy corrections and uncertainties
+    // Localized version available in github.com/miquork/jecsys/
+    // Copied from there
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/Utilities.cc+");
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/JetCorrectorParameters.cc+");
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/SimpleJetCorrector.cc+");
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/FactorizedJetCorrector.cc+");
+
+    // For JEC uncertainty
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/SimpleJetCorrectionUncertainty.cc+");
+    gROOT->ProcessLine(
+        ".L CondFormats/JetMETObjects/src/JetCorrectionUncertainty.cc+");
+
+    // compile code
+    gROOT->ProcessLine(".L tools.C+");
+    gROOT->ProcessLine(".L runHistos.C+");
+    gROOT->ProcessLine(".L basicHistos.C+");
+
+    gROOT->ProcessLine(".L fillHistos.C+g"); // +g for assert to work
+
+// This is already included in the .C files above
+// Including it again breaks CLING in ROOT 6.04.10
+#include "settings.h"
+
+    std::string algo = "ak7";
+    if (_jp_algo == "AK8")
+        algo = "ak8";
+    if (_jp_algo == "AK7")
+        algo = "ak7";
+    if (_jp_algo == "AK4")
+        algo = "ak4";
+
+
+    // connect trees
+    TChain *c = new TChain((algo + "/ProcessedTree").c_str());
+    
+    if (_jp_type == "DATA") {
+        cout << "Load trees..." << endl;
+
+        // 2011A
+        c->AddFile("tuples0.root");
+        //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/ProcessedTree_test/160617_103739/0000/tuples0.root");
+        
+        cout << "Got " << c->GetEntries() << " entries" << endl;
+    }
+
+    /*
+    if (_jp_type == "MC") {
+        if (_jp_pthatbins) {
+            cout << "Running over pthat bins" << endl;
+            cout << "Load trees..." << endl;
+
+            if (_jp_ak4ak8) {
+                cout << "Load friend trees..." << endl;
+            }
+        } else {
+            cout << "Running over flat sample" << endl;
+            cout << "Load trees..." << endl;
+
+            c->AddFile(
+                "moremc/"
+                "ProcessedTree_QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_"
+                "pythia8_RunIISpring15DR74-Asympt25nsRaw_MCRUN2_74_V9-v3."
+                "root"); //  25 ns
+            // c->AddFile("moremc/Pythia8-CUETP8M1-Ntuples-PFJets.root"); // 50
+            // ns
+
+            cout << "Got " << c->GetEntries() << " entries" << endl;
+
+            if (_jp_ak4ak8) {
+                cout << "Load friend trees..." << endl;
+                cout << "Got " << d->GetEntries() << " entries" << endl;
+            }
+        }
+    }
+
+    if (_jp_type == "HW") {
+        cout << "Running over Herwig flat sample" << endl;
+        cout << "Load trees..." << endl;
+        cout << "Got " << c->GetEntries() << " entries" << endl;
+
+        if (_jp_ak4ak8) {
+            cout << "Load friend trees..." << endl;
+            cout << "Got " << d->GetEntries() << " entries" << endl;
+        }
+    }
+    */
+    
+    // Awkward patch for ROOT6:
+    // Call 'Loop()' and 'delete this;' inside constructor;
+    fillHistos(c);
+}

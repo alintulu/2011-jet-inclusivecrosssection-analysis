@@ -1,0 +1,7 @@
+*~
+*.d
+*.so
+*.o
+*_cc_ACLiC_dict_rdict.pcm
+tuples0.root
+.__afs*

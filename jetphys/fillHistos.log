@@ -1,0 +1,17 @@
+
+Starting Loop() initialization:
+MemInfo(Tot:15571, Used:15054, Free:517, Stot:18191, SUsed:616, SFree:17575
+initBasics(Standard):
+MemInfo(Tot:15571, Used:15055, Free:516, Stot:18191, SUsed:616, SFree:17575
+initBasics(Standard) finished:
+MemInfo(Tot:15571, Used:15405, Free:166, Stot:18191, SUsed:616, SFree:17575
+Beginning Loop() proper:
+MemInfo(Tot:15571, Used:15403, Free:168, Stot:18191, SUsed:616, SFree:17575
+Doing Loop(), 0M events:
+MemInfo(Tot:15571, Used:15390, Free:181, Stot:18191, SUsed:616, SFree:17575
+Finished processing 99 entries:
+MemInfo(Tot:15571, Used:15390, Free:181, Stot:18191, SUsed:616, SFree:17575
+writeBasics():
+MemInfo(Tot:15571, Used:15390, Free:181, Stot:18191, SUsed:616, SFree:17575
+writeBasic() finished:
+MemInfo(Tot:15571, Used:13143, Free:2428, Stot:18191, SUsed:616, SFree:17575
