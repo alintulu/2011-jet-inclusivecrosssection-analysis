@@ -119,7 +119,9 @@ void recurseFile(TDirectory *indir, TDirectory *outdir,
 
             // Normalize hpt and hselpt histograms
             // Same for hbpt
-            if (string(obj2->GetName())=="hpt" || string(obj2->GetName())=="hpt_pre" ) {
+            if (string(obj2->GetName())=="hpt"      || 
+                string(obj2->GetName())=="hpt_pre"  ||
+                string(obj2->GetName())=="hpt_g0tw"  ) {
 
                 cout << "." << flush;
             

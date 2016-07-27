@@ -37,11 +37,10 @@ void fillHistos::Loop()
     // Read luminosities from file
     if (_dt && _jp_dolumi) loadLumi(_jp_lumifile);
 
-    
     Long64_t nentries = fChain->GetEntriesFast();
     //nentries = 10; // debug
     //nentries = 1000;//very short test runs
-    // nentries = 100000;//short test runs
+    //nentries = 100000;//short test runs
     //nentries = 1000000;//medium test runs
     // nentries = 5000000; // lunch-break run for MC (with trigsim off)
     
@@ -56,7 +55,7 @@ void fillHistos::Loop()
     
     // Event loop
     for (Long64_t jentry=0; jentry<nentries;jentry++) {
-        
+
         // Error check
         Long64_t ientry = LoadTree(jentry);
         if (ientry < 0) break;
@@ -67,6 +66,7 @@ void fillHistos::Loop()
         // Write this event to histograms
         if (_jp_doBasicHistos) {
             fillBasics("Standard");
+
         }    
     }
         
@@ -95,7 +95,6 @@ void fillHistos::initBasics(std::string name) {
     assert(topdir);
     
     topdir->cd();
-
 
     // Rapidity bins + HF + barrel
     double y[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.2, 4.7, 0., 1.3};
@@ -191,17 +190,14 @@ void fillHistos::fillBasic(basicHistos *h) {
 
     // Index of the trigger corresponding to this histogram
     unsigned int trg_index = find(triggernames->begin(), triggernames->end(), h->trigname) - triggernames->begin();
- 
+    
+
     // Return if not triggered
     bool fired = (triggers[trg_index]);
-    if (!fired)
+    if (!fired) {
         return;
-
-    // Luminosity information
-    double lum;
-    if (_dt && h->lums[run][lumi]==0) {
-        lum = _lums[run][lumi];
     }
+
 
     // Check for missing prescale
     unsigned int prescale = prescales[trg_index];
@@ -211,13 +207,20 @@ void fillHistos::fillBasic(basicHistos *h) {
         assert(false);
     }
 
-    // Add this event to the luminosity sum
-    h->lumsum += lum / prescale;
+    // Luminosity information
+    
+    if (_dt && h->lums[run][lumi]==0) {
+        double lum = _lums[run][lumi];
+        // Add this event to the luminosity sum
+        h->lumsum += lum / prescale;
+        h->lums[run][lumi] = 1;
+    }
 
     // Loop over jets of this event
     for (unsigned int i = 0; i != njet; ++i) {
-        if (_debug)
+        if (_debug) {
             cout << "Loop over jet " << i << "/" << njet << endl;
+        }
 
         double pt = fabs(jet_pt[i]);
         double eta = fabs(jet_eta[i]);
@@ -225,7 +228,12 @@ void fillHistos::fillBasic(basicHistos *h) {
         if (pt > _jp_recopt && eta >= h->ymin && eta < h->ymax)  {
 
             // Fill raw pT spectrum
-            h->hpt->Fill(jet_pt[i]);
+            if (_dt) {
+                h->hpt->Fill(jet_pt[i]);
+            }
+            else if (_mc) {
+                h->hpt->Fill(jet_pt[i], mcweight);
+            }
 
             // Prescaled pT
             if (_dt) {
@@ -234,6 +242,17 @@ void fillHistos::fillBasic(basicHistos *h) {
 
         }
     }
+
+    if (_mc) {
+        for (unsigned int i = 0; i != ngen; ++i) {
+            double eta = gen_eta[i];
+
+            if (fabs(eta) >= h->ymin && fabs(eta) < h->ymax) {
+                h->hpt_g0tw->Fill(gen_pt[i], mcweight);
+            }
+        }
+    }
+
 } 
 
 
@@ -250,7 +269,6 @@ void fillHistos::writeBasics() {
 
                 // For data, save effective luminosity information
                 h->hlumi->SetBinContent(j, _dt ? h->lumsum : 1.);
-                std::cout << h->lumsum << " " << h->trigname << std::endl;
             }
 
             // Delete basic histos

@@ -3,5 +3,8 @@
 *.so
 *.o
 *_cc_ACLiC_dict_rdict.pcm
-tuples0.root
+*_C_ACLiC_dict_rdict.pcm
+*.root
+!output*.root
 .__afs*
+*.tar.gz

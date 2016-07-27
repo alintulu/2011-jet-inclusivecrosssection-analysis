@@ -44,62 +44,27 @@
     if (_jp_algo == "AK4")
         algo = "ak4";
 
+    // Common tree name for both MC and DATA
+    TChain *c = new TChain("ak7/OpenDataTree");
 
-    // connect trees
-    TChain *c = new TChain((algo + "/ProcessedTree").c_str());
-    
     if (_jp_type == "DATA") {
         cout << "Load trees..." << endl;
 
         // 2011A
         c->AddFile("tuples0.root");
-        //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/ProcessedTree_test/160617_103739/0000/tuples0.root");
+        //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/crab_OpenDataTree_all/160722_132928/0000/tuples0.root");
         
         cout << "Got " << c->GetEntries() << " entries" << endl;
     }
-
-    /*
-    if (_jp_type == "MC") {
-        if (_jp_pthatbins) {
-            cout << "Running over pthat bins" << endl;
-            cout << "Load trees..." << endl;
-
-            if (_jp_ak4ak8) {
-                cout << "Load friend trees..." << endl;
-            }
-        } else {
-            cout << "Running over flat sample" << endl;
-            cout << "Load trees..." << endl;
-
-            c->AddFile(
-                "moremc/"
-                "ProcessedTree_QCD_Pt-15to7000_TuneCUETP8M1_Flat_13TeV_"
-                "pythia8_RunIISpring15DR74-Asympt25nsRaw_MCRUN2_74_V9-v3."
-                "root"); //  25 ns
-            // c->AddFile("moremc/Pythia8-CUETP8M1-Ntuples-PFJets.root"); // 50
-            // ns
-
-            cout << "Got " << c->GetEntries() << " entries" << endl;
-
-            if (_jp_ak4ak8) {
-                cout << "Load friend trees..." << endl;
-                cout << "Got " << d->GetEntries() << " entries" << endl;
-            }
-        }
-    }
-
-    if (_jp_type == "HW") {
-        cout << "Running over Herwig flat sample" << endl;
+    else if (_jp_type == "MC") 
+    {
         cout << "Load trees..." << endl;
-        cout << "Got " << c->GetEntries() << " entries" << endl;
 
-        if (_jp_ak4ak8) {
-            cout << "Load friend trees..." << endl;
-            cout << "Got " << d->GetEntries() << " entries" << endl;
-        }
+        //c->AddFile("MC/MC_tuples.root");  
+        c->AddFile("OpenDataTree_mc.root");      
+        cout << "Got " << c->GetEntries() << " entries" << endl;
     }
-    */
-    
+
     // Awkward patch for ROOT6:
     // Call 'Loop()' and 'delete this;' inside constructor;
     fillHistos(c);

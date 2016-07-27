@@ -105,7 +105,6 @@ void dagostiniUnfold(string type) {
   assert(fin && !fin->IsZombie());
 
   //TFile *fin2 = new TFile(Form("output-%s-2c.root",type.c_str()),"READ");
-  //TFile *fin2 = new TFile(Form("output-%s-2b.root",type.c_str()),"READ");
   TFile *fin2 = new TFile(Form("output-%s-2c.root","MC"),"READ");
   assert(fin2 && !fin2->IsZombie());
 

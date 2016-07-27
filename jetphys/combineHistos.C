@@ -63,6 +63,8 @@ void combineHistos(string type) {
     recurseFile(fin, fout, "hpt_pre");
     if (_dt)
         recurseFile(fin, fout, "hlumi");
+    if (_mc)
+        recurseFile(fin, fout, "hpt_g0tw");
 
     curdir->cd();
 

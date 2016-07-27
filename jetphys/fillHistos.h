@@ -200,7 +200,7 @@ void fillHistos::Init(TTree *tree)
    fCurrent = -1;
    fChain->SetMakeClass(1);
 
-   _type = "DATA";
+   _type.assign(_jp_type);
    _dt = (_type=="DATA");
    _mc = !_dt;
    

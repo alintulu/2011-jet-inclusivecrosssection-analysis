@@ -24,14 +24,14 @@ std::string _jp_type = "DATA";
 
 // Number of events to process (-1 for all)
 Long64_t _jp_nentries = -1;
-//Long64_t _jp_nentries = 1000000; // for MC
+// Long64_t _jp_nentries = 1000000; // for MC
 // Number of events to skip from the beginning
 Long64_t _jp_nskip = 0;
 
 // PU profiles for data and MC
-bool _jp_reweighPU = false;//true;
+bool _jp_reweighPU = false; // true;
 std::string _jp_pudata = "pileup/pileup_Jan16th_mb735.root";
-std::string _jp_pumc   = "pileup/pileup_PY.root";
+std::string _jp_pumc = "pileup/pileup_PY.root";
 
 // JEC text files in CondFormats/JetMETObjects/data/
 bool _jp_redoJEC = true;
@@ -42,11 +42,11 @@ const bool _jp_doECALveto = false;
 std::string _jp_ecalveto = "lumicalc/ecalveto.root";
 
 // Reapply json selection based on the latest one (check lumicalc if false!)
-const bool _jp_dojson = false;//true;
+const bool _jp_dojson = false; // true;
 std::string _jp_json = "lumicalc/lumiSummary_Jan16th.json";
 
 // Calculate luminosity on the fly based on .csv file
-const bool _jp_dolumi = true; 
+const bool _jp_dolumi = true;
 std::string _jp_lumifile = "lumicalc/pixellumi_by_LS.csv";
 
 // List of triggers used in the analysis
@@ -62,14 +62,18 @@ double _jp_trigranges[_jp_ntrigger][2] =
 */
 
 // This is the 7 TeV list
-const int _jp_ntrigger = 8; 
-std::string _jp_triggers[_jp_ntrigger] =
-  {"jt30",    "jt60",    "jt80",   "jt110",   "jt150",   "jt190",  "jt240",   "jt370"};
-double _jp_trigthr[_jp_ntrigger] =
-  {    30,        60,        80,       110,       150,       190,      240,       370};
-double _jp_trigranges[_jp_ntrigger][2] =
-  {{0,97},  {97,174}, {174,174}, {174,300}, {300,300}, {300,362}, {362, 507},{507,3500}};
-
+const int _jp_ntrigger = 8;
+std::string _jp_triggers[_jp_ntrigger] = {"jt30",  "jt60",  "jt80",  "jt110",
+                                          "jt150", "jt190", "jt240", "jt370"};
+double _jp_trigthr[_jp_ntrigger] = {30, 60, 80, 110, 150, 190, 240, 370};
+double _jp_trigranges[_jp_ntrigger][2] = {{0, 97},
+                                          {97, 174},
+                                          {174, 174},
+                                          {174, 300},
+                                          {300, 300},
+                                          {300, 362},
+                                          {362, 507},
+                                          {507, 3500}};
 
 // Decide whether or not to simulate triggers from MC (this is slow)
 bool _jp_domctrigsim = false;
@@ -78,16 +82,16 @@ bool _jp_usemctrig = true;
 std::string _jp_mctrig = "jt370"; // reference trigger (for PU profile)
 
 // Unprescaled luminosity for plots
-const double _jp_lumi = 100.; // pixelLumi
-const double _jp_sqrts = 7000.; // GeV
-const double _jp_emax = _jp_sqrts/2.; // GeV
+const double _jp_lumi = 100.;           // pixelLumi
+const double _jp_sqrts = 7000.;         // GeV
+const double _jp_emax = _jp_sqrts / 2.; // GeV
 
 //////////////////////////////////
 // Additional analysis switches //
 //////////////////////////////////
 
 // Do additional AK4/AK8 histograms
-const bool _jp_ak4ak8 = (_jp_algo=="AK8" && false);
+const bool _jp_ak4ak8 = (_jp_algo == "AK8" && false);
 // Apply "CHS" through betaStar
 const bool _jp_doCHS = false;
 // Fill histograms separately for each five eras
@@ -102,8 +106,8 @@ const bool _jp_doBasicHistos = true;
 // Process pThatbins instead of flat sample
 const bool _jp_pthatbins = false;
 // Correct for trigger efficiency based on MC
-const bool _jp_dotrigeff = false;//true;
- // Correct pT<114 GeV only, if above _jp_dotrigeff=true
+const bool _jp_dotrigeff = false; // true;
+// Correct pT<114 GeV only, if above _jp_dotrigeff=true
 const bool _jp_dotrigefflowptonly = true;
 // Correct for time-dependence (prescales) in data
 const bool _jp_dotimedep = true;
@@ -111,9 +115,9 @@ const bool _jp_dotimedep = true;
 const bool _jp_doMatrix = false;
 
 // Check that run / lumi section was listed in the .csv file
-const bool _jp_dolumcheck = true;//false;
+const bool _jp_dolumcheck = true; // false;
 //// Veto bad run list
-//const bool _jp_dorunveto = false;
+// const bool _jp_dorunveto = false;
 // Check for duplicates (warning: takes a lot of memory!)
 const bool _jp_checkduplicates = true;
 // Only load selected branches (large speedup, but be careful!)
@@ -125,20 +129,20 @@ const bool _jp_centerOnTheory = false;
 // Plot Pythia for final PRL results
 const bool _plotPythia = false;
 // Minimum and maximum pT range to be plotted and fitted
-const double _jp_recopt = 24;//21.;
+const double _jp_recopt = 24; // 21.;
 const double _jp_fitptmin = 43;
 // Changed on 2013-05-020: analysis from 49 GeV to 56 GeV
 const double _jp_xmin57 = 56;
 const double _jp_xminpas = 56;
-const double _jp_xmin = 24.;//20.;
+const double _jp_xmin = 24.; // 20.;
 const double _jp_xmax = 1999.;
 
 const double _jp_xsecMinBias = 7.126E+10;
 
 //// Write histograms to PAS file
-//const bool _jp_pas = true;
+// const bool _jp_pas = true;
 // Draw b-jets against MC@NLO instead of reco MC
-//const bool _mcnlo = true;
+// const bool _mcnlo = true;
 //// Draw againts HERAPDF1.7 instead of PDF4LHC
 const bool _jp_herapdf = false;
 
