@@ -51,7 +51,7 @@
         cout << "Load trees..." << endl;
 
         // 2011A
-        c->AddFile("tuples0.root");
+        c->AddFile("data/tuples0.root");
         //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/crab_OpenDataTree_all/160722_132928/0000/tuples0.root");
         
         cout << "Got " << c->GetEntries() << " entries" << endl;
@@ -60,8 +60,7 @@
     {
         cout << "Load trees..." << endl;
 
-        //c->AddFile("MC/MC_tuples.root");  
-        c->AddFile("OpenDataTree_mc.root");      
+        c->AddFile("MC/MC_tuples.root");  
         cout << "Got " << c->GetEntries() << " entries" << endl;
     }
 

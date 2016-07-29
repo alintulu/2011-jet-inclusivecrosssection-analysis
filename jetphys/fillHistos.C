@@ -42,7 +42,7 @@ void fillHistos::Loop()
     //nentries = 1000;//very short test runs
     //nentries = 100000;//short test runs
     //nentries = 1000000;//medium test runs
-    // nentries = 5000000; // lunch-break run for MC (with trigsim off)
+    //nentries = 5000000; // lunch-break run for MC (with trigsim off)
     
     _entries = nentries;
 
@@ -54,7 +54,7 @@ void fillHistos::Loop()
     }
     
     // Event loop
-    for (Long64_t jentry=0; jentry<nentries;jentry++) {
+    for (Long64_t jentry=0; jentry < nentries;jentry++) {
 
         // Error check
         Long64_t ientry = LoadTree(jentry);
@@ -222,17 +222,26 @@ void fillHistos::fillBasic(basicHistos *h) {
             cout << "Loop over jet " << i << "/" << njet << endl;
         }
 
-        double pt = fabs(jet_pt[i]);
-        double eta = fabs(jet_eta[i]);
+        double pt       = jet_pt[i];
+        double eta      = jet_eta[i];
+        double phi      = jet_phi[i];
+        double energy   = jet_E[i];
 
-        if (pt > _jp_recopt && eta >= h->ymin && eta < h->ymax)  {
+        p4.SetPtEtaPhiE(pt, eta, phi, energy);
+        double y = p4.Rapidity();
+        jet_y[i] = y; // Save rapididty for later
 
+        double y_abs = fabs(jet_y[i]);
+
+        if (pt > _jp_recopt && h->ymin <= y_abs && y_abs < h->ymax)  {
+
+            assert(h->hpt);
             // Fill raw pT spectrum
             if (_dt) {
-                h->hpt->Fill(jet_pt[i]);
+                h->hpt->Fill(pt);
             }
             else if (_mc) {
-                h->hpt->Fill(jet_pt[i], mcweight);
+                h->hpt->Fill(pt, mcweight);
             }
 
             // Prescaled pT
@@ -241,7 +250,43 @@ void fillHistos::fillBasic(basicHistos *h) {
             }
 
         }
-    }
+    }  
+
+
+    /*
+    // Calculate and fill dijet mass
+    if (njet>=2) {
+
+        // Leading jet indices
+        int i0 = 0;
+        int i1 = 1;
+
+        j0.SetPtEtaPhiE(jet_pt[i0], jet_eta[i0], jet_phi[i0], jet_E[i0]);
+        j1.SetPtEtaPhiE(jet_pt[i1], jet_eta[i1], jet_phi[i1], jet_E[i1]);
+        
+        bool eventId = (met < 0.4 * sumet || met < 45.); // QCD-11-004
+        bool goodMass = (jet_pt[i0] > 60. && jet_pt[i1] > 30.);
+        double dijetMass = (j0+j1).M();
+        double ymaxDijet = max(fabs(jet_eta[i0]), fabs(jet_eta[i1])); // Do we use (pseudo)rapidity??
+        
+        if (eventId && goodMass && jet_tightID[i0] && jet_tightID[i1] &&
+            ymaxDijet >= h->ymin && ymaxDijet < h->ymax) {
+            
+            assert(h->hdjmass); // Safety check
+            if (_dt) {
+                h->hdjmass->Fill(dijetMass); 
+            }
+            else if (_mc) {
+                h->hdjmass->Fill(dijetMass, mcweight);
+            }
+
+        }
+      
+    } // dijet mass
+
+    */
+
+  if (_debug) cout << "Calculate and fill dijet balance" << endl << flush;
 
     if (_mc) {
         for (unsigned int i = 0; i != ngen; ++i) {

@@ -90,7 +90,7 @@ Double_t smearedAnsatz(Double_t *x, Double_t *p) {
   if (p[5]>0 && p[5]<_jp_emax/cosh(eta)) ptmin = p[5];
   if (p[6]>0 && p[6]<_jp_emax/cosh(eta)) ptmax = p[6];
 
-  return ( _kernel->Integral(ptmin, ptmax, _epsilon) );
+  return ( _kernel->Integral(ptmin, ptmax) ); // mhaapale !! (Removed  _epsilon)
 }
 
 void recurseFile(TDirectory *indir, TDirectory *indir2, TDirectory *outdir,
@@ -182,7 +182,7 @@ void recurseFile(TDirectory *indir, TDirectory *indir2, TDirectory *outdir,
 
       _jk = 0;
       if (TString(obj->GetName()).Contains("hpt_jk")) {
-	assert( sscanf(obj->GetName(), "hpt_jk%d", &_jk) == 1);
+	       assert( sscanf(obj->GetName(), "hpt_jk%d", &_jk) == 1);
       }
       _jet = TString(obj->GetName()).Contains("hpt_jet");
       

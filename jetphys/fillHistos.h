@@ -11,6 +11,7 @@
 #include <TROOT.h>
 #include <TChain.h>
 #include <TFile.h>
+#include <math.h> 
 
 #include "TMath.h"
 #include "TF1.h"
@@ -53,6 +54,7 @@ public :
    Float_t         jet_eta[kMaxNjet];   //[njet]
    Float_t         jet_phi[kMaxNjet];   //[njet]
    Float_t         jet_E[kMaxNjet];   //[njet]
+   Float_t         jet_y[kMaxNjet];  // NOTE: not included in the tuple!
    Bool_t          jet_tightID[kMaxNjet];   //[njet]
    Float_t         jet_area[kMaxNjet];   //[njet]
    Float_t         jet_jes[kMaxNjet];   //[njet]
@@ -136,11 +138,14 @@ private:
    // MC weights
    double _w, _w0;
 
-   // Recorded luminosity by run and lumisection
+   // Recorded luminosity by run and lumisection numbers
    std::map<int, std::map<int, float> > _lums;
    
    // Total number of events
    Long64_t _entries;
+
+   // Helper variables to compute dijet mass
+   TLorentzVector j0, j1, p4;
 
 };
 

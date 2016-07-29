@@ -49,19 +49,18 @@ void theory(string type) {
     TFile *fmc = new TFile("output-MC-2b.root", "READ");
     assert(fmc && !fmc->IsZombie());
 
-    TFile *fout =
-        new TFile(Form("output-%s-2c.root", type.c_str()), "RECREATE");
+    TFile *fout = new TFile(Form("output-%s-2c.root", type.c_str()), "RECREATE");
     assert(fout && !fout->IsZombie());
 
     // Select top category
-    assert(fin->cd("Standard"));
+    fin->cd("Standard");
     TDirectory *din0 = gDirectory;
 
-    assert(fmc->cd("Standard"));
+    fmc->cd("Standard");
     TDirectory *dmc0 = gDirectory;
 
     fout->mkdir("Standard");
-    assert(fout->cd("Standard"));
+    fout->cd("Standard");
     TDirectory *dout0 = gDirectory;
 
     // Automatically go through the list of keys (directories)
@@ -78,19 +77,19 @@ void theory(string type) {
             string(obj->GetName()) != "Eta_0.0-1.3" &&
             string(obj->GetName()) != "Eta_3.0-3.2" &&
             string(obj->GetName()) != "Eta_3.2-4.7") {
-            assert(din0->cd(obj->GetName()));
+
+            din0->cd(obj->GetName());
             TDirectory *din = gDirectory;
 
-            assert(dmc0->cd(obj->GetName()));
+            dmc0->cd(obj->GetName());
             TDirectory *dmc = gDirectory;
 
-
-
             dout0->mkdir(obj->GetName());
-            assert(dout0->cd(obj->GetName()));
+            dout0->cd(obj->GetName());
             TDirectory *dout = gDirectory;
 
-            // Process subdirectory
+
+            // Process rapidity bin
             theoryBin(din, dmc, dout);
 
         } // inherits TDirectory
@@ -111,14 +110,17 @@ void theory(string type) {
 
 void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
 
-    float etamin, etamax;
-    assert(sscanf(din->GetName(), "Eta_%f-%f", &etamin, &etamax) == 2);
+    float etamin = 0;
+    float etamax = 0;
+    sscanf(din->GetName(), "Eta_%f-%f", &etamin, &etamax);
+
+    std::cout << etamin << ' ' << etamax << std::endl;
+
     int ieta = int((0.5 * (etamin + etamax)) / 0.5);
     int jeta = (_jp_algo == "AK7" ? min(4, ieta) : ieta);
 
     // inclusive jets
     TH1D *hpt = (TH1D *)din->Get("hpt");
-    assert(hpt);
 
     // theory curves
     // http://www-ekp.physik.uni-karlsruhe.de/~rabbertz/fastNLO_LHC/InclusiveJets/

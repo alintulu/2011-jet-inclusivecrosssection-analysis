@@ -121,6 +121,7 @@ void recurseFile(TDirectory *indir, TDirectory *outdir,
             // Same for hbpt
             if (string(obj2->GetName())=="hpt"      || 
                 string(obj2->GetName())=="hpt_pre"  ||
+                //string(obj2->GetName())=="hdjmass"  ||
                 string(obj2->GetName())=="hpt_g0tw"  ) {
 
                 cout << "." << flush;
@@ -141,7 +142,7 @@ void recurseFile(TDirectory *indir, TDirectory *outdir,
                     norm *= trigeff;
                 
                     // Normalization for luminosity, except prescaled histogram
-                    if (hlumi->GetBinContent(i) != 0 && !ispre) {
+                    if (hlumi->GetBinContent(i) != 0 && !ispre && _dt ) {
                         norm *= hlumi->GetBinContent(i);
                     }
 

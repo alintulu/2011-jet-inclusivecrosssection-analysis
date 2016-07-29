@@ -144,7 +144,10 @@ basicHistos::basicHistos(TDirectory *dir, std::string trigname,
     hlumi = new TH1D("hlumi", "", nx, &x[0]);
 
     // Generator spectrum
-    hpt_g0tw = new TH1D("hpt_g0tw","",nx,&x[0]); // _mc per trigger
+    hpt_g0tw = new TH1D("hpt_g0tw", "", nx, &x[0]); // _mc per trigger
+
+    // Dijet mass spectrum
+    //hdjmass = new TH1D("hdjmass", "", nx, &x[0]);
 
     curdir->cd();
 }
