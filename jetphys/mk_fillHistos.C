@@ -36,22 +36,15 @@
 // Including it again breaks CLING in ROOT 6.04.10
 #include "settings.h"
 
-    std::string algo = "ak7";
-    if (_jp_algo == "AK8")
-        algo = "ak8";
-    if (_jp_algo == "AK7")
-        algo = "ak7";
-    if (_jp_algo == "AK4")
-        algo = "ak4";
-
     // Common tree name for both MC and DATA
-    TChain *c = new TChain("ak7/OpenDataTree");
+    TChain *c = new TChain("ak5ak7/OpenDataTree");
 
     if (_jp_type == "DATA") {
         cout << "Load trees..." << endl;
 
         // 2011A
-        c->AddFile("data/tuples0.root");
+        //c->AddFile("data/tuples0.root");
+        c->AddFile("data/OpenDataTree_data.root");
         //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/crab_OpenDataTree_all/160722_132928/0000/tuples0.root");
         
         cout << "Got " << c->GetEntries() << " entries" << endl;

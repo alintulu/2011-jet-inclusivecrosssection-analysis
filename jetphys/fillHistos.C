@@ -217,21 +217,21 @@ void fillHistos::fillBasic(basicHistos *h) {
     }
 
     // Loop over jets of this event
-    for (unsigned int i = 0; i != njet; ++i) {
+    for (unsigned int i = 0; i != ak5_njet; ++i) {
         if (_debug) {
-            cout << "Loop over jet " << i << "/" << njet << endl;
+            cout << "Loop over jet " << i << "/" << ak5_njet << endl;
         }
 
-        double pt       = jet_pt[i];
-        double eta      = jet_eta[i];
-        double phi      = jet_phi[i];
-        double energy   = jet_E[i];
+        double pt       = ak5_pt[i];
+        double eta      = ak5_eta[i];
+        double phi      = ak5_phi[i];
+        double energy   = ak5_E[i];
 
         p4.SetPtEtaPhiE(pt, eta, phi, energy);
         double y = p4.Rapidity();
-        jet_y[i] = y; // Save rapididty for later
+        ak5_y[i] = y; // Save rapididty for later
 
-        double y_abs = fabs(jet_y[i]);
+        double y_abs = fabs(ak5_y[i]);
 
         if (pt > _jp_recopt && h->ymin <= y_abs && y_abs < h->ymax)  {
 
