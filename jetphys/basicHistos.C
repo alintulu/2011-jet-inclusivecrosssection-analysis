@@ -13,24 +13,22 @@
 using namespace std;
 
 basicHistos::basicHistos(TDirectory *dir, std::string trigname,
-                         std::string cotrig, double ymin, double ymax,
-                         double pttrg, double ptmin, double ptmax, bool ismc,
-                         bool dofriends, bool ak4ak8)
-    : lumsum(0), lumsum2(0) {
+                         double ymin, double ymax,
+                         double pttrg, double ptmin, double ptmax, bool ismc)
+                        : lumsum(0) {
+    
     TDirectory *curdir = gDirectory;
     dir->cd();
     this->dir = dir;
 
     // phase space
     this->trigname = trigname;
-    this->cotrig = cotrig;
     this->ymin = ymin;
     this->ymax = ymax;
     this->pttrg = pttrg;
     this->ptmin = ptmin;
     this->ptmax = ptmax;
-    this->dofriends = dofriends;
-    this->ak4ak8 = ak4ak8;
+    this->ismc = ismc;
 
     // Once and for all (even if few too many with Sumw2)
     TH1::SetDefaultSumw2(kTRUE);
@@ -106,35 +104,19 @@ basicHistos::basicHistos(TDirectory *dir, std::string trigname,
          548, 592, 638, 686, 737, 790, 846, 905, 967, 1032, 0, 0, 0, 0, 0, 0, 0,
          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0}}; // Eta_2.5-3.0
 
+    // Rapidity bin index
     int ieta = int(0.5 * (ymin + ymax) / 0.5);
     assert(ieta < neta);
+
+    // pT bins
     vector<double> x;
     for (int i = 0; i != nbins && vx[ieta][i] != 0; ++i) {
         x.push_back(vx[ieta][i]);
-    } // for i
+    } 
+
+    // Number of pT bins
     const int nx = x.size() - 1;
 
-    const double ay[] = {0,    0.261, 0.522, 0.783, 0.957, 1.131, 1.305, 1.479,
-                         1.93, 2.322, 2.411, 2.5,   2.853, 2.964, 5.191};
-    const int nay = sizeof(ay) / sizeof(ay[0]);
-
-    vector<double> yW(nay);
-    for (unsigned int i = 0; i != yW.size(); ++i) {
-        yW[i] = ay[i];
-    }
-    const int nyW = yW.size() - 1;
-
-    vector<double> y(51);
-    for (unsigned int i = 0; i != y.size(); ++i) {
-        y[i] = -5. + 0.2 * i;
-    }
-    const int ny = y.size() - 1;
-
-    vector<double> pv(26);
-    for (unsigned int i = 0; i != pv.size(); ++i) {
-        pv[i] = -0.5 + i;
-    }
-    const int npv = pv.size() - 1;
 
     // Raw spectrum
     hpt = new TH1D("hpt", "", nx, &x[0]);
@@ -145,9 +127,6 @@ basicHistos::basicHistos(TDirectory *dir, std::string trigname,
 
     // Generator spectrum
     hpt_g0tw = new TH1D("hpt_g0tw", "", nx, &x[0]); // _mc per trigger
-
-    // Dijet mass spectrum
-    //hdjmass = new TH1D("hdjmass", "", nx, &x[0]);
 
     curdir->cd();
 }

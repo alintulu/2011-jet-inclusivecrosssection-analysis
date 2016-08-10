@@ -32,9 +32,6 @@
 
     gROOT->ProcessLine(".L fillHistos.C+g"); // +g for assert to work
 
-// This is already included in the .C files above
-// Including it again breaks CLING in ROOT 6.04.10
-#include "settings.h"
 
     // Common tree name for both MC and DATA
     TChain *c = new TChain("ak5ak7/OpenDataTree");
@@ -43,8 +40,8 @@
         cout << "Load trees..." << endl;
 
         // 2011A
-        //c->AddFile("data/tuples0.root");
-        c->AddFile("data/OpenDataTree_data.root");
+        c->AddFile("data/tuples1.root");
+        //c->AddFile("data/OpenDataTree_data.root");
         //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/crab_OpenDataTree_all/160722_132928/0000/tuples0.root");
         
         cout << "Got " << c->GetEntries() << " entries" << endl;

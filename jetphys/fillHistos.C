@@ -6,30 +6,8 @@
 
 void fillHistos::Loop()
 {
-//   In a ROOT session, you can do:
-//      Root > .L fillHistos.C
-//      Root > fillHistos t
-//      Root > t.GetEntry(12); // Fill t data members with entry number 12
-//      Root > t.Show();       // Show values of entry 12
-//      Root > t.Show(16);     // Read and show values of entry 16
-//      Root > t.Loop();       // Loop on all entries
-//
 
-//     This is the loop skeleton where:
-//    jentry is the global entry number in the chain
-//    ientry is the entry number in the current Tree
-//  Note that the argument to GetEntry must be:
-//    jentry for TChain::GetEntry
-//    ientry for TTree::GetEntry and TBranch::GetEntry
-//
-//       To read only selected branches, Insert statements like:
-// METHOD1:
-//    fChain->SetBranchStatus("*",0);  // disable all branches
-//    fChain->SetBranchStatus("branchname",1);  // activate branchname
-// METHOD2: replace line
-//    fChain->GetEntry(jentry);       //read all branches
-//by  b_branchname->GetEntry(ientry); //read only this branch
-    
+    // Check that chain is valid
     if (fChain == 0) {
         return;
     }
@@ -37,18 +15,31 @@ void fillHistos::Loop()
     // Read luminosities from file
     if (_dt && _jp_dolumi) loadLumi(_jp_lumifile);
 
-    Long64_t nentries = fChain->GetEntriesFast();
-    //nentries = 10; // debug
-    //nentries = 1000;//very short test runs
-    //nentries = 100000;//short test runs
-    //nentries = 1000000;//medium test runs
-    //nentries = 5000000; // lunch-break run for MC (with trigsim off)
+    // Number of events
+    Long64_t nentries = 0; 
+    if (_jp_nentries >= 0) {
+        nentries = min(fChain->GetEntries(), _jp_nentries);
+    }
+    else {
+        nentries = fChain->GetEntries();
+    }
     
-    _entries = nentries;
-
     // Switch all branches ON
-    fChain->SetBranchStatus("*", 1);
-    
+    fChain->SetBranchStatus("*", 0);
+
+    fChain->SetBranchStatus("ak5_njet", 1);
+    fChain->SetBranchStatus("ak5_pt", 1);
+    fChain->SetBranchStatus("ak5_eta", 1);
+    fChain->SetBranchStatus("ak5_phi", 1);
+    fChain->SetBranchStatus("ak5_E", 1);
+
+    fChain->SetBranchStatus("triggers", 1);
+    fChain->SetBranchStatus("triggernames", 1);
+    fChain->SetBranchStatus("prescales", 1);
+
+    fChain->SetBranchStatus("run", 1);
+    fChain->SetBranchStatus("lumi", 1);
+
     if (_jp_doBasicHistos) {
         initBasics("Standard");
     }
@@ -66,7 +57,6 @@ void fillHistos::Loop()
         // Write this event to histograms
         if (_jp_doBasicHistos) {
             fillBasics("Standard");
-
         }    
     }
         
@@ -78,43 +68,49 @@ void fillHistos::Loop()
 }
 
 
-// Initialize basic histograms for trigger and eta bins
 void fillHistos::initBasics(std::string name) {
-    // Report memory usage to avoid malloc problems when writing file
+// Initialize basic histograms for trigger and eta bins
 
+    // Save current directory
     TDirectory *curdir = gDirectory;
 
-    // open file for output
+    // Create output file
     TFile *f = (_outfile ? _outfile: new TFile(Form("output-%s-1.root", _type.c_str()), "RECREATE"));
-    assert(f && !f->IsZombie());
     
+    // Safety check
+    assert(f && !f->IsZombie() && "Error while creating output file!");
+    
+    // Create top-level directory
     f->mkdir(name.c_str());
-    assert(f->cd(name.c_str()));
+    assert(f->cd(name.c_str()) && "Error while creating directory");
 
+    // Move into the directory
     TDirectory *topdir = f->GetDirectory(name.c_str());
-    assert(topdir);
-    
+    assert(topdir);    
     topdir->cd();
 
     // Rapidity bins + HF + barrel
     double y[] = {0., 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.2, 4.7, 0., 1.3};
     const int ny = sizeof(y) / sizeof(y[0]) - 1;
 
-    // Trigger bins
 
-    // Efficient trigger pT ranges for control plots
-    map< string, pair< double, double > > pt;
+    // Trigger bins
+    // Efficient trigger pT ranges
+    map< std::string, pair< double, double > > pt;
     for (int itrg = 0; itrg != _jp_ntrigger; ++itrg) {
-        string trg = _jp_triggers[itrg];
-        double pt1 = _jp_trigranges[itrg][0];
-        double pt2 = _jp_trigranges[itrg][1];
+        std::string trg = _jp_triggers[itrg]; // Trigger name
+        double pt1 = _jp_trigranges[itrg][0]; // Lower bound
+        double pt2 = _jp_trigranges[itrg][1]; // Upper bound
+
         pt[trg] = pair< double, double >(pt1, pt2);
     }
 
-    map< string, double > pttrg;
+    // Trigger thresholds
+    map< std::string, double > pttrg;
     for (int itrg = 0; itrg != _jp_ntrigger; ++itrg) {
-        string trg = _jp_triggers[itrg];
-        double pt0 = _jp_trigthr[itrg];
+        std::string trg = _jp_triggers[itrg]; // Trigger name
+        double pt0      = _jp_trigthr[itrg];  // Threshold
+        
         pttrg[trg] = pt0;
     }
 
@@ -133,7 +129,7 @@ void fillHistos::initBasics(std::string name) {
 
             // Change to the subdirectory
             topdir->mkdir(yname);
-            assert(topdir->cd(yname));
+            assert(topdir->cd(yname) && "Error while creating directory");
             
             TDirectory *ydir = topdir->GetDirectory(yname);
             assert(ydir);
@@ -142,27 +138,23 @@ void fillHistos::initBasics(std::string name) {
             
             // Loop over triggers
             for (std::string trg_name: trg_names) {
-                
-                if (trg_name == "jt300") {
-                    continue;
-                }
 
                 // Trigger subdirectory
                 const char *trg = trg_name.c_str();
                 assert(ydir);
                 
+                // Create directory
                 ydir->mkdir(trg);
                 ydir->cd(trg);
                 
                 // Change directory
                 TDirectory *dir = ydir->GetDirectory(trg);
                 assert(dir);
-                
                 dir->cd();
-                // Initialize and store histogram 
-                basicHistos *h = new basicHistos(   dir, trg, "", y[i], y[i + 1], 
-                                                    pttrg[trg], pt[trg].first, pt[trg].second, 
-                                                    trg_name == "mc", false, _jp_ak4ak8);
+
+                // Initialize histograms of this bin 
+                basicHistos *h = new basicHistos(dir, trg, y[i], y[i + 1], pttrg[trg],
+                                                 pt[trg].first, pt[trg].second, _mc);
             
                 _histos[name].push_back(h);
             }
@@ -175,7 +167,7 @@ void fillHistos::initBasics(std::string name) {
 } 
 
 
-// Loop over histogram container to fill them
+// Loop over the histograms of the container and fill them
 void fillHistos::fillBasics(std::string name) {
     
     for (auto const& h: _histos[name]) {
@@ -183,21 +175,20 @@ void fillHistos::fillBasics(std::string name) {
     }
 }
 
-// Fill basic histograms after applying pt, y cuts
+// Fill basic histograms after applying pT and y cuts
 void fillHistos::fillBasic(basicHistos *h) {
+
     // Check valididty
     assert(h && "Invalid histogram set!");
 
     // Index of the trigger corresponding to this histogram
     unsigned int trg_index = find(triggernames->begin(), triggernames->end(), h->trigname) - triggernames->begin();
     
-
     // Return if not triggered
     bool fired = (triggers[trg_index]);
     if (!fired) {
         return;
     }
-
 
     // Check for missing prescale
     unsigned int prescale = prescales[trg_index];
@@ -208,120 +199,90 @@ void fillHistos::fillBasic(basicHistos *h) {
     }
 
     // Luminosity information
-    
-    if (_dt && h->lums[run][lumi]==0) {
+    if (_dt && h->lums[run][lumi] == 0) {
+        // Recorded luminosity in this lumi section
         double lum = _lums[run][lumi];
-        // Add this event to the luminosity sum
+        
+        // Count this lumisection in the sum (with prescale)
         h->lumsum += lum / prescale;
+
+        // No double counting
         h->lums[run][lumi] = 1;
     }
 
     // Loop over jets of this event
     for (unsigned int i = 0; i != ak5_njet; ++i) {
+        
         if (_debug) {
-            cout << "Loop over jet " << i << "/" << ak5_njet << endl;
+           std::cout << "Loop over jet " << i << "/" << ak5_njet << endl;
         }
 
+        // Corrected 4-momentum
         double pt       = ak5_pt[i];
         double eta      = ak5_eta[i];
         double phi      = ak5_phi[i];
         double energy   = ak5_E[i];
 
+        // Compute rapidity and save it
         p4.SetPtEtaPhiE(pt, eta, phi, energy);
         double y = p4.Rapidity();
-        ak5_y[i] = y; // Save rapididty for later
+        ak5_y[i] = y; 
 
+        // Absolute rapidity
         double y_abs = fabs(ak5_y[i]);
 
+        // Test whether jet belongs to this rapidity bin
         if (pt > _jp_recopt && h->ymin <= y_abs && y_abs < h->ymax)  {
 
-            assert(h->hpt);
             // Fill raw pT spectrum
             if (_dt) {
+                assert(h->hpt);
                 h->hpt->Fill(pt);
             }
             else if (_mc) {
                 h->hpt->Fill(pt, mcweight);
             }
 
-            // Prescaled pT
+            // Fill prescaled pT spectrum
             if (_dt) {
                 h->hpt_pre->Fill(pt, prescales[trg_index]);
             }
 
         }
     }  
-
-
-    /*
-    // Calculate and fill dijet mass
-    if (njet>=2) {
-
-        // Leading jet indices
-        int i0 = 0;
-        int i1 = 1;
-
-        j0.SetPtEtaPhiE(jet_pt[i0], jet_eta[i0], jet_phi[i0], jet_E[i0]);
-        j1.SetPtEtaPhiE(jet_pt[i1], jet_eta[i1], jet_phi[i1], jet_E[i1]);
-        
-        bool eventId = (met < 0.4 * sumet || met < 45.); // QCD-11-004
-        bool goodMass = (jet_pt[i0] > 60. && jet_pt[i1] > 30.);
-        double dijetMass = (j0+j1).M();
-        double ymaxDijet = max(fabs(jet_eta[i0]), fabs(jet_eta[i1])); // Do we use (pseudo)rapidity??
-        
-        if (eventId && goodMass && jet_tightID[i0] && jet_tightID[i1] &&
-            ymaxDijet >= h->ymin && ymaxDijet < h->ymax) {
-            
-            assert(h->hdjmass); // Safety check
-            if (_dt) {
-                h->hdjmass->Fill(dijetMass); 
-            }
-            else if (_mc) {
-                h->hdjmass->Fill(dijetMass, mcweight);
-            }
-
-        }
-      
-    } // dijet mass
-
-    */
-
-  if (_debug) cout << "Calculate and fill dijet balance" << endl << flush;
-
+    /*// Unbiased generator spectrum (needed for unfolding)
     if (_mc) {
         for (unsigned int i = 0; i != ngen; ++i) {
-            double eta = gen_eta[i];
+            double y = gen_y[i];
 
-            if (fabs(eta) >= h->ymin && fabs(eta) < h->ymax) {
+            if (fabs(y) >= h->ymin && fabs(y) < h->ymax) {
                 h->hpt_g0tw->Fill(gen_pt[i], mcweight);
             }
         }
     }
-
+    */
 } 
-
 
 void fillHistos::writeBasics() {
 
-    for (map< string, vector< basicHistos * > >::iterator it = _histos.begin(); it != _histos.end(); ++it) {
-        
-            
-        // Loop over all histograms of all directories of the output file
-        for (unsigned int i = 0; i != it->second.size(); ++i) {
+    for (auto it = _histos.begin(); it != _histos.end(); ++it) {
+        std::vector<basicHistos*> histoList = it->second;
 
-            basicHistos *h = it->second[i];
+        // Loop over bins of the output file
+        for ( basicHistos *h : histoList) {
+
+            // For data, save effective luminosity
             for (int j = 0; j != h->hlumi->GetNbinsX() + 1; ++j) {
-
-                // For data, save effective luminosity information
                 h->hlumi->SetBinContent(j, _dt ? h->lumsum : 1.);
             }
 
-            // Delete basic histos
+            // Delete histograms from memory
             delete h; 
         }             
     }   
 
-    cout << "\nOutput stored in " << _outfile->GetName() << endl;
+    std::cout << "\nOutput stored in " << _outfile->GetName() << endl;
+
     _outfile->Close();
     _outfile->Delete();
 }
@@ -330,9 +291,9 @@ void fillHistos::writeBasics() {
 // Load luminosity information
 void fillHistos::loadLumi(const std::string filename) {
 
-    // Open file
+    // Open luminosity file
     std::ifstream CSVfile(filename);
-    assert(CSVfile.is_open());
+    assert(CSVfile.is_open() && "Error while opening luminosity file!");
 
     // Read header
     std::string header;
@@ -341,31 +302,31 @@ void fillHistos::loadLumi(const std::string filename) {
     
     // Require proper header format
     assert(header == string("Run:Fill,LS,UTCTime,Beam Status,E(GeV),Delivered(/ub),Recorded(/ub),avgPU"));
-      
-    double lumsum(0);
-    bool skip(false);
     
-    // One line of the file
-    std::string line;
-
     // Total number of lumisections
     unsigned int nls;
 
+    // Total recorded integrated luminosity
+    double lumsum = 0;
+
+    // One line of the file
+    std::string line;
     while ( getline(CSVfile, line, '\r') ) {
 
-        double rec;     // Recorded lumi in ub        
-        unsigned int rn;// Run
-        unsigned int ls;// Lumisection
+        double rec;      // Recorded lumi in microbarns (ub)        
+        unsigned int rn; // Run number
+        unsigned int ls; // Lumisection number
 
         // Parse one line
         sscanf(line.c_str(),"%d:%*d,%d:%*d,%*d/%*d/%*d %*d:%*d:%*d,STABLE BEAMS,%*f,%*f,%lf,%*f", &rn, &ls, &rec);
-        double lum = rec*1e-6; // Recorded luminosity in pb
+        double lum = rec*1e-6;  // Convert ub to pb
 
-        _lums[rn][ls] = lum;
-        lumsum += lum;
+        _lums[rn][ls] = lum;    // Save lumi section luminosity
+
+        lumsum += lum;          // Add to luminosity sum 
 
         ++nls;
-        assert(nls<100000000);
+        assert(nls < 10e8 && "Error while reading luminosity info!");  
     }
 
     std::cout << "Called loadLumi(\"" << filename << "\"):" << endl;
@@ -374,5 +335,4 @@ void fillHistos::loadLumi(const std::string filename) {
               << lumsum << " pb-1 of data " << std::endl;
     std::cout << "This corresponds to " << nls*23.3/3600
               << " hours of data-taking" << endl;
-      
 } 

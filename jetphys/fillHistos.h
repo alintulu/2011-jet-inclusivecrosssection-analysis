@@ -157,7 +157,6 @@ public :
 
    
    virtual ~fillHistos();
-   virtual Int_t    Cut(Long64_t entry);
    virtual Int_t    GetEntry(Long64_t entry);
    virtual Long64_t LoadTree(Long64_t entry);
    virtual void     Init(TTree *tree);
@@ -188,12 +187,9 @@ private:
 
    // Recorded luminosity by run and lumisection numbers
    std::map<int, std::map<int, float> > _lums;
-   
-   // Total number of events
-   Long64_t _entries;
 
-   // Helper variables to compute dijet mass
-   TLorentzVector j0, j1, p4;
+   // Helper variable
+   TLorentzVector p4;
 
 };
 
@@ -215,12 +211,14 @@ fillHistos::~fillHistos()
    delete fChain->GetCurrentFile();
 }
 
+
 Int_t fillHistos::GetEntry(Long64_t entry)
 {
 // Read contents of entry.
    if (!fChain) return 0;
    return fChain->GetEntry(entry);
 }
+
 Long64_t fillHistos::LoadTree(Long64_t entry)
 {
 // Set the environment to read one entry
@@ -328,11 +326,5 @@ void fillHistos::Show(Long64_t entry)
    if (!fChain) return;
    fChain->Show(entry);
 }
-Int_t fillHistos::Cut(Long64_t entry)
-{
-// This function may be called from Loop.
-// returns  1 if entry is accepted.
-// returns -1 otherwise.
-   return 1;
-}
+
 #endif // #ifdef fillHistos_cxx
