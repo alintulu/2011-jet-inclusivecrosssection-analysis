@@ -24,14 +24,14 @@ void fillHistos::Loop()
         nentries = fChain->GetEntries();
     }
     
-    // Switch all branches ON
+    // Switch all branches OFF
     fChain->SetBranchStatus("*", 0);
 
-    fChain->SetBranchStatus("ak5_njet", 1);
-    fChain->SetBranchStatus("ak5_pt", 1);
-    fChain->SetBranchStatus("ak5_eta", 1);
-    fChain->SetBranchStatus("ak5_phi", 1);
-    fChain->SetBranchStatus("ak5_E", 1);
+    fChain->SetBranchStatus("njet", 1);
+    fChain->SetBranchStatus("jet_pt", 1);
+    fChain->SetBranchStatus("jet_eta", 1);
+    fChain->SetBranchStatus("jet_phi", 1);
+    fChain->SetBranchStatus("jet_E", 1);
 
     fChain->SetBranchStatus("triggers", 1);
     fChain->SetBranchStatus("triggernames", 1);
@@ -211,25 +211,25 @@ void fillHistos::fillBasic(basicHistos *h) {
     }
 
     // Loop over jets of this event
-    for (unsigned int i = 0; i != ak5_njet; ++i) {
+    for (unsigned int i = 0; i != njet; ++i) {
         
         if (_debug) {
-           std::cout << "Loop over jet " << i << "/" << ak5_njet << endl;
+           std::cout << "Loop over jet " << i << "/" << njet << endl;
         }
 
         // Corrected 4-momentum
-        double pt       = ak5_pt[i];
-        double eta      = ak5_eta[i];
-        double phi      = ak5_phi[i];
-        double energy   = ak5_E[i];
+        double pt       = jet_pt[i];
+        double eta      = jet_eta[i];
+        double phi      = jet_phi[i];
+        double energy   = jet_E[i];
 
         // Compute rapidity and save it
         p4.SetPtEtaPhiE(pt, eta, phi, energy);
         double y = p4.Rapidity();
-        ak5_y[i] = y; 
+        jet_y[i] = y; 
 
         // Absolute rapidity
-        double y_abs = fabs(ak5_y[i]);
+        double y_abs = fabs(jet_y[i]);
 
         // Test whether jet belongs to this rapidity bin
         if (pt > _jp_recopt && h->ymin <= y_abs && y_abs < h->ymax)  {
@@ -250,7 +250,7 @@ void fillHistos::fillBasic(basicHistos *h) {
 
         }
     }  
-    /*// Unbiased generator spectrum (needed for unfolding)
+    // Unbiased generator spectrum (needed for unfolding)
     if (_mc) {
         for (unsigned int i = 0; i != ngen; ++i) {
             double y = gen_y[i];
@@ -260,7 +260,7 @@ void fillHistos::fillBasic(basicHistos *h) {
             }
         }
     }
-    */
+    
 } 
 
 void fillHistos::writeBasics() {
@@ -329,6 +329,7 @@ void fillHistos::loadLumi(const std::string filename) {
         assert(nls < 10e8 && "Error while reading luminosity info!");  
     }
 
+    // Summary
     std::cout << "Called loadLumi(\"" << filename << "\"):" << endl;
     std::cout << "Loaded " << _lums.size() << " runs with "
               << nls << " lumi sections containing "

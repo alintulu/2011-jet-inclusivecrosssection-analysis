@@ -40,7 +40,7 @@
         cout << "Load trees..." << endl;
 
         // 2011A
-        c->AddFile("data/tuples1.root");
+        c->AddFile("data/tuples2.root");
         //c->AddFile("data/OpenDataTree_data.root");
         //c->AddFile("root://eoscms.cern.ch//eos/cms/store/group/phys_smp/mhaapale/Jet/crab_OpenDataTree_all/160722_132928/0000/tuples0.root");
         
@@ -55,6 +55,5 @@
     }
 
     // Awkward patch for ROOT6:
-    // Call 'Loop()' and 'delete this;' inside constructor;
     fillHistos(c);
 }
