@@ -2,6 +2,8 @@
 // Author:   mikko.voutilainen@cern.ch
 // Created:  March 20, 2010
 // Updated:  June 9, 2015
+
+
 #ifndef __basicHistos_h__
 #define __basicHistos_h__
 
@@ -21,7 +23,7 @@ class basicHistos {
 
  public:
 
-  // phase space
+  // Phase space
   std::string trigname;
   double ymin;
   double ymax;
@@ -30,19 +32,18 @@ class basicHistos {
   double ptmax;
   bool ismc;
 
-  // luminosity
+  // Luminosity
   TH1D *hlumi;
   std::map<int, std::map<int, float> > lums;
   double lumsum;
 
-  // Raw spectrum
+  // Raw spectra
   TH1D *hpt;
   TH1D *hpt_pre;
 
   // Unbiased generator spectrum
   TH1D *hpt_g0tw;
 
-  //Rapidity closure
   basicHistos(TDirectory *dir, std::string trigname="", 
 	            double ymin = 0., double ymax = 2.0,
 	            double pttrg = 10., double ptmin = 10., double ptmax = 50.,
@@ -53,4 +54,4 @@ class basicHistos {
   TDirectory *dir;
 };
 
-#endif // __basicHistos_h__
+#endif

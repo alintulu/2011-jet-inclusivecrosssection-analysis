@@ -12,7 +12,7 @@ void fillHistos::Loop()
         return;
     }
 
-    // Read luminosities from file
+    // Read recorded luminosities from text file
     if (_dt && _jp_dolumi) loadLumi(_jp_lumifile);
 
     // Number of events
@@ -32,6 +32,15 @@ void fillHistos::Loop()
     fChain->SetBranchStatus("jet_eta", 1);
     fChain->SetBranchStatus("jet_phi", 1);
     fChain->SetBranchStatus("jet_E", 1);
+
+    fChain->SetBranchStatus("njet", 1);
+    fChain->SetBranchStatus("jet_*", 1);
+
+    if (_jp_type == "MC") {
+        fChain->SetBranchStatus("ngen", 1);
+        fChain->SetBranchStatus("gen_*", 1);
+        fChain->SetBranchStatus("mcweight", 1);
+    }
 
     fChain->SetBranchStatus("triggers", 1);
     fChain->SetBranchStatus("triggernames", 1);
@@ -75,7 +84,7 @@ void fillHistos::initBasics(std::string name) {
     TDirectory *curdir = gDirectory;
 
     // Create output file
-    TFile *f = (_outfile ? _outfile: new TFile(Form("output-%s-1.root", _type.c_str()), "RECREATE"));
+    TFile *f = (_outfile ? _outfile: new TFile(Form("outputs/output-%s-1.root", _type.c_str()), "RECREATE"));
     
     // Safety check
     assert(f && !f->IsZombie() && "Error while creating output file!");
@@ -98,9 +107,9 @@ void fillHistos::initBasics(std::string name) {
     // Efficient trigger pT ranges
     map< std::string, pair< double, double > > pt;
     for (int itrg = 0; itrg != _jp_ntrigger; ++itrg) {
-        std::string trg = _jp_triggers[itrg]; // Trigger name
-        double pt1 = _jp_trigranges[itrg][0]; // Lower bound
-        double pt2 = _jp_trigranges[itrg][1]; // Upper bound
+        std::string trg = _jp_triggers[itrg];       // Trigger name
+        double pt1      = _jp_trigranges[itrg][0];  // Lower bound
+        double pt2      = _jp_trigranges[itrg][1];  // Upper bound
 
         pt[trg] = pair< double, double >(pt1, pt2);
     }
@@ -179,7 +188,7 @@ void fillHistos::fillBasics(std::string name) {
 void fillHistos::fillBasic(basicHistos *h) {
 
     // Check valididty
-    assert(h && "Invalid histogram set!");
+    assert(h && "Invalid set of histograms!");
 
     // Index of the trigger corresponding to this histogram
     unsigned int trg_index = find(triggernames->begin(), triggernames->end(), h->trigname) - triggernames->begin();
@@ -190,6 +199,8 @@ void fillHistos::fillBasic(basicHistos *h) {
         return;
     }
 
+
+
     // Check for missing prescale
     unsigned int prescale = prescales[trg_index];
     if (prescale == 0 && fired) {
@@ -197,6 +208,7 @@ void fillHistos::fillBasic(basicHistos *h) {
                 << " in run " << run << "!" << endl << flush; 
         assert(false);
     }
+
 
     // Luminosity information
     if (_dt && h->lums[run][lumi] == 0) {
@@ -209,6 +221,7 @@ void fillHistos::fillBasic(basicHistos *h) {
         // No double counting
         h->lums[run][lumi] = 1;
     }
+
 
     // Loop over jets of this event
     for (unsigned int i = 0; i != njet; ++i) {
@@ -228,15 +241,17 @@ void fillHistos::fillBasic(basicHistos *h) {
         double y = p4.Rapidity();
         jet_y[i] = y; 
 
+
         // Absolute rapidity
         double y_abs = fabs(jet_y[i]);
 
         // Test whether jet belongs to this rapidity bin
         if (pt > _jp_recopt && h->ymin <= y_abs && y_abs < h->ymax)  {
 
+
             // Fill raw pT spectrum
+            assert(h->hpt);
             if (_dt) {
-                assert(h->hpt);
                 h->hpt->Fill(pt);
             }
             else if (_mc) {
@@ -250,13 +265,18 @@ void fillHistos::fillBasic(basicHistos *h) {
 
         }
     }  
+
     // Unbiased generator spectrum (needed for unfolding)
     if (_mc) {
         for (unsigned int i = 0; i != ngen; ++i) {
-            double y = gen_y[i];
+        
+            // GenJet rapidity
+            p4gen.SetPtEtaPhiE(gen_pt[i], gen_eta[i], gen_phi[i], gen_E[i]);
+            double y = p4.Rapidity();
 
-            if (fabs(y) >= h->ymin && fabs(y) < h->ymax) {
+            if (h->ymin <= fabs(y) && fabs(y) < h->ymax) {
                 h->hpt_g0tw->Fill(gen_pt[i], mcweight);
+
             }
         }
     }
@@ -306,7 +326,7 @@ void fillHistos::loadLumi(const std::string filename) {
     // Total number of lumisections
     unsigned int nls;
 
-    // Total recorded integrated luminosity
+    // Total recorded luminosity
     double lumsum = 0;
 
     // One line of the file
@@ -319,10 +339,9 @@ void fillHistos::loadLumi(const std::string filename) {
 
         // Parse one line
         sscanf(line.c_str(),"%d:%*d,%d:%*d,%*d/%*d/%*d %*d:%*d:%*d,STABLE BEAMS,%*f,%*f,%lf,%*f", &rn, &ls, &rec);
+        
         double lum = rec*1e-6;  // Convert ub to pb
-
         _lums[rn][ls] = lum;    // Save lumi section luminosity
-
         lumsum += lum;          // Add to luminosity sum 
 
         ++nls;

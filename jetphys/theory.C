@@ -41,15 +41,15 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout);
 void dataBin(TDirectory *din, TDirectory *dout);
 
 void theory(string type) {
-    // TFile *fin = new TFile(Form("output-%s-3a.root",type.c_str()),"READ");
-    TFile *fin = new TFile(Form("output-%s-2b.root", type.c_str()), "READ");
+    // TFile *fin = new TFile(Form("outputs/output-%s-3a.root",type.c_str()),"READ");
+    TFile *fin = new TFile(Form("outputs/output-%s-2b.root", type.c_str()), "READ");
     assert(fin && !fin->IsZombie());
 
     // LO Pythia MC prediction
-    TFile *fmc = new TFile("output-MC-2b.root", "READ");
+    TFile *fmc = new TFile("outputs/output-MC-2b.root", "READ");
     assert(fmc && !fmc->IsZombie());
 
-    TFile *fout = new TFile(Form("output-%s-2c.root", type.c_str()), "RECREATE");
+    TFile *fout = new TFile(Form("outputs/output-%s-2c.root", type.c_str()), "RECREATE");
     assert(fout && !fout->IsZombie());
 
     // Select top category

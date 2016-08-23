@@ -31,11 +31,11 @@ void normalizeHistos(string type) {
     _dt = (type=="DATA");
 
     // Input file
-    TFile *fin = new TFile(Form("output-%s-1.root",type.c_str()),"READ");
+    TFile *fin = new TFile(Form("outputs/output-%s-1.root",type.c_str()),"READ");
     assert(fin && !fin->IsZombie());
 
     // Output file
-    TFile *fout = new TFile(Form("output-%s-2a.root",type.c_str()),"RECREATE");
+    TFile *fout = new TFile(Form("outputs/output-%s-2a.root",type.c_str()),"RECREATE");
     assert(fout && !fout->IsZombie());
 
     std::cout << "Calling normalizeHistos("<< type <<");" << std::endl;

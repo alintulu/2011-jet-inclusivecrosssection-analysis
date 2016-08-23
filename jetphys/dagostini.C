@@ -101,14 +101,14 @@ void dagostiniUnfold_histo(TH1D *hpt, TH1D *hpt2, TDirectory *outdir,
 
 void dagostiniUnfold(string type) {
 
-  TFile *fin = new TFile(Form("output-%s-2b.root",type.c_str()),"READ");
+  TFile *fin = new TFile(Form("outputs/output-%s-2b.root",type.c_str()),"READ");
   assert(fin && !fin->IsZombie());
 
-  //TFile *fin2 = new TFile(Form("output-%s-2c.root",type.c_str()),"READ");
-  TFile *fin2 = new TFile(Form("output-%s-2c.root","MC"),"READ");
+  //TFile *fin2 = new TFile(Form("outputs/output-%s-2c.root",type.c_str()),"READ");
+  TFile *fin2 = new TFile(Form("outputs/output-%s-2c.root","MC"),"READ");
   assert(fin2 && !fin2->IsZombie());
 
-  TFile *fout = new TFile(Form("output-%s-3.root",type.c_str()),"RECREATE");
+  TFile *fout = new TFile(Form("outputs/output-%s-3.root",type.c_str()),"RECREATE");
   assert(fout && !fout->IsZombie());
 
   _ak7 = (_jp_algo=="AK7");
@@ -772,7 +772,7 @@ void drawDagostini(string type) {
   TDirectory *curdir = gDirectory;
   setTDRStyle();
 
-  TFile *f = new TFile(Form("output-%s-3.root",type.c_str()),"READ");
+  TFile *f = new TFile(Form("outputs/output-%s-3.root",type.c_str()),"READ");
   assert(f && !f->IsZombie());
 
   assert(f->cd("Standard"));

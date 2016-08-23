@@ -1,9 +1,25 @@
-//////////////////////////////////////////////////////////
-// This class has been automatically generated on
-// Thu Jul  7 17:14:10 2016 by ROOT version 5.32/00
-// from TTree ProcessedTree/ProcessedTree
-// found on file: tuples0.root
-//////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////
+// Instructions to create the skeleton of this header:
+//
+// 1. Open the tuple file in ROOT:
+//    root tuples2_MC.root
+//
+// 2. Open a ROOT browser:
+//    TBrowser t
+//
+// 3. Click through the directories of the file until you see the variables 
+//    and the relevant TTree (e.g. OpenDataTree) is higlighted.
+//
+// 4. Back in the ROOT prompt, run:
+//    OpenDataTree->MakeClass("thisIsYourScript")
+//
+// 5. If successful, you should something like this:
+//    "Info in <TTreePlayer::MakeClass>: Files: thisIsYourScript.h and 
+//    thisIsYourScript.C generated from TTree: OpenDataTree"
+//
+////////////////////////////////////////////////////////////////////////////
+
+
 
 #ifndef fillHistos_h
 #define fillHistos_h
@@ -30,20 +46,15 @@
 
 #include "settings.h"
 #include "basicHistos.h"
-#include "runHistos.h"
 #include "tools.h"
 
-#include "CondFormats/JetMETObjects/interface/FactorizedJetCorrector.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectorParameters.h"
-#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
-
-// Fixed size dimensions of array or collections stored in the TTree if any.
 
 class fillHistos {
 public :
    TTree          *fChain;   //!pointer to the analyzed TTree or TChain
    Int_t           fCurrent; //!current Tree number in a TChain
 
+   // Create these static variables to define the size of fixed size arrays
    static const UInt_t kMaxNjet = 100;
    static const UInt_t kMaxNtrg = 64;
 
@@ -133,8 +144,8 @@ private:
    // Recorded luminosity by run and lumisection numbers
    std::map<int, std::map<int, float> > _lums;
 
-   // Helper variable
-   TLorentzVector p4;
+   // Helper variables
+   TLorentzVector p4, p4gen;
 
 };
 
@@ -179,13 +190,7 @@ Long64_t fillHistos::LoadTree(Long64_t entry)
 
 void fillHistos::Init(TTree *tree)
 {
-   // The Init() function is called when the selector needs to initialize
-   // a new tree or chain. Typically here the branch addresses and branch
-   // pointers of the tree will be set.
-   // It is normally not necessary to make changes to the generated
-   // code, but the routine can be extended by the user if needed.
-   // Init() will be called many times when running on PROOF
-   // (once per file to be processed).
+// Initialize 
 
    // Set object pointer
    triggernames = 0;
@@ -207,10 +212,10 @@ void fillHistos::Init(TTree *tree)
    fChain->SetBranchAddress("jet_E", jet_E, &b_jet_E);
 
    fChain->SetBranchAddress("ngen", &ngen, &b_ngen);
-   fChain->SetBranchAddress("gen_pt", &gen_pt, &b_gen_pt);
-   fChain->SetBranchAddress("gen_eta", &gen_eta, &b_gen_eta);
-   fChain->SetBranchAddress("gen_phi", &gen_phi, &b_gen_phi);
-   fChain->SetBranchAddress("gen_E", &gen_E, &b_gen_E);
+   fChain->SetBranchAddress("gen_pt", gen_pt, &b_gen_pt);
+   fChain->SetBranchAddress("gen_eta", gen_eta, &b_gen_eta);
+   fChain->SetBranchAddress("gen_phi", gen_phi, &b_gen_phi);
+   fChain->SetBranchAddress("gen_E", gen_E, &b_gen_E);
 
    fChain->SetBranchAddress("run", &run, &b_run);
    fChain->SetBranchAddress("lumi", &lumi, &b_lumi);
@@ -222,17 +227,12 @@ void fillHistos::Init(TTree *tree)
    fChain->SetBranchAddress("prescales", prescales, &b_prescales);
 
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
+
    Notify();
 }
 
 Bool_t fillHistos::Notify()
 {
-   // The Notify() function is called when a new file is opened. This
-   // can be either for a new TTree in a TChain or when when a new TTree
-   // is started when using PROOF. It is normally not necessary to make changes
-   // to the generated code, but the routine can be extended by the
-   // user if needed. The return value is currently not used.
-
    return kTRUE;
 }
 
@@ -240,8 +240,9 @@ void fillHistos::Show(Long64_t entry)
 {
 // Print contents of entry.
 // If entry is not specified, print current entry
+   
    if (!fChain) return;
    fChain->Show(entry);
 }
 
-#endif // #ifdef fillHistos_cxx
+#endif

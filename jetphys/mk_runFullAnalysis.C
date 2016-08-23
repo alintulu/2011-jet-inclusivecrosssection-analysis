@@ -3,6 +3,26 @@
 // Created: March 20, 2010
 // Updated: June 1, 2015
 {
+/*
+Producing lumicalc_by_LS.csv on LXPLUS:
+Does not work on virtual machine, 
+since it connects to an internal CERN database!
+
+==> Produces a list of recorded luminosities by lumisection (16 MB)
+
+mkdir Luminosity
+cd Luminosity
+cmsrel CMSSW_5_3_32
+cd CMSSW_5_3_32
+cmsenv
+git clone https://github.com/cms-sw/RecoLuminosity-LumiDB.git $CMSSW_BASE/src/RecoLuminosity/LumiDB
+cd $CMSSW_BASE/src/RecoLuminosity/LumiDB
+git checkout V04-02-10
+wget http://opendata.cern.ch/record/1001/files/Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt
+pixelLumiCalc.py -i Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt -o  pixellumi_by_LS.csv lumibyls
+
+*/
+
 
     // ***** BEFORE RUNNING THE ANALYSIS ****** //
     // NB: more detailed instructions are at the end
@@ -12,21 +32,8 @@
     // * Point mk_fillHistos.C to correct data/MC files, 
     //   mk_theory.C to correct theory, and fillHistos.C to correct JSON etc.
     //   [tbd: make these all configurable]
-    // * Optimize bins for given luminosity (optimizeBins.C, basicHistos.C)
-    //
-    // (Check that new runs are listed in JetMETTau stream)
-    // (Update trigger thresholds in mk_combineHistos.C)
-    // (Update lumi and max pT in settings.h)
-    // Reoptimize bins for given luminosity (optimizeBins.C, basicHistos.C)
-    // Instructions of getting the external data are at the end
 
-    // ***** AFTER RUNNING THE ANALYSIS ****** //
-    // (=> update his part)
-    // Check the new results in the Analysis Note:
-    // cd pas; cp -pi ../comparisons/pasPF.root .; root -l -b -q mk_pasPlots.C
-    // cp -p fig7_Comparison_*_LUM.pdf ../latex/figs/
-    // cp -p pflow_*_LUM.pdf ../latex/figs/
-    // cd ../latex; sh copy_anplots.sh; pdflatex inclbpfjets.tex
+
 
 
     // Setup directories
