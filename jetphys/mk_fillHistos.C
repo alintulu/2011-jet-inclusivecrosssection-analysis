@@ -12,7 +12,7 @@
 
 
     // Load tuples from file
-    TChain *chain = new TChain("ak7/OpenDataTree");
+    TChain *chain = new TChain("ak5ak7/OpenDataTree");
     assert(chain);
 
     if (_jp_type == "DATA") {
@@ -26,7 +26,7 @@
     {
         std::cout << "Load trees..." << std::endl;
 
-        chain->AddFile("MC/tuples0_MC.root"); 
+        chain->AddFile("MC/tuples2_MC.root"); 
 
         std::cout << "Got " << chain->GetEntries() << " entries" << std::endl;
     }

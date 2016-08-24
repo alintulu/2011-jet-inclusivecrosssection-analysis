@@ -8,3 +8,5 @@
 !output*.root
 .__afs*
 *.tar.gz
+RooUnfold/
+*.log
