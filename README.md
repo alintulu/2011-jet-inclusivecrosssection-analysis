@@ -1,6 +1,7 @@
-# CMS Jet analysis example
+# 2011-jet-inclusivecrosssection-ntupleproduction
+Validation code for 2011 jet dataset, based on inclusive jet cross section - step 1: ntuple production
 
-Work in progress
+***Work in progress***
 
 ## TODO list
 * Provide links to the data and Monte Carlo tuples in the OpenData portal
