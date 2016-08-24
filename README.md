@@ -4,7 +4,7 @@ Work in progress
 
 ## TODO list
 * Provide links to the data and Monte Carlo tuples in the OpenData portal
-(On LXPLUS: ```~mhaapale/work/public/Jet-Tuples-Summer2016/```)
+(On LXPLUS: ```/afs/cern.ch/user/m/mhaapale/work/public/Jet-Tuples-Summer2016```)
 * Change paths of the input files
 * Analyse Data and Monte Carlo 
 * Prettier plots
