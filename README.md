@@ -1,5 +1,5 @@
-# 2011-jet-inclusivecrosssection-ntupleproduction
-Validation code for 2011 jet dataset, based on inclusive jet cross section - step 1: ntuple production
+# 2011-jet-inclusivecrosssection-analysis
+Validation code for 2011 jet dataset, based on inclusive jet cross section - step 2: analysis
 
 ***Work in progress***
 
