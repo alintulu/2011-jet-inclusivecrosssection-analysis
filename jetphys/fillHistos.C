@@ -36,6 +36,7 @@ void fillHistos::Loop()
     fChain->SetBranchStatus("njet", 1);
     fChain->SetBranchStatus("jet_*", 1);
 
+    // Switch on Monte Carlo branches
     if (_jp_type == "MC") {
         fChain->SetBranchStatus("ngen", 1);
         fChain->SetBranchStatus("gen_*", 1);
