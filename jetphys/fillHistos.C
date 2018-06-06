@@ -325,7 +325,7 @@ void fillHistos::loadLumi(const std::string filename) {
     assert(header == string("Run:Fill,LS,UTCTime,Beam Status,E(GeV),Delivered(/ub),Recorded(/ub),avgPU"));
     
     // Total number of lumisections
-    unsigned int nls;
+    int nls = 0;
 
     // Total recorded luminosity
     double lumsum = 0;
@@ -346,7 +346,7 @@ void fillHistos::loadLumi(const std::string filename) {
         lumsum += lum;          // Add to luminosity sum 
 
         ++nls;
-        assert(nls < 10e8 && "Error while reading luminosity info!");  
+	//assert(nls < 10e8 && "Error while reading luminosity info!");  
     }
 
     // Summary
