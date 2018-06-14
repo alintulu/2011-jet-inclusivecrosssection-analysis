@@ -346,7 +346,7 @@ void fillHistos::loadLumi(const std::string filename) {
         lumsum += lum;          // Add to luminosity sum 
 
         ++nls;
-	//assert(nls < 10e8 && "Error while reading luminosity info!");  
+	assert(nls < 10e8 && "Error while reading luminosity info!");  
     }
 
     // Summary
