@@ -85,6 +85,9 @@ public :
 
    Float_t         mcweight;
 
+   Float_t 	   met;
+   Float_t	   sumet;
+
    // List of branches
    TBranch        *b_njet;   //!
    TBranch        *b_jet_pt;   //!
@@ -108,6 +111,9 @@ public :
    TBranch        *b_prescales;   //!
 
    TBranch        *b_mcweight;   //!
+
+   TBranch	  *b_met;
+   TBranch	  *b_sumet;
 
    fillHistos(TTree *tree=0);
 
@@ -228,6 +234,9 @@ void fillHistos::Init(TTree *tree)
 
    fChain->SetBranchAddress("mcweight", &mcweight, &b_mcweight);
 
+   fChain->SetBranchAddress("met", &met, &b_met);
+   fChain->SetBranchAddress("sumet", &sumet, &b_sumet);   
+   
    Notify();
 }
 

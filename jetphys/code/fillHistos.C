@@ -50,10 +50,30 @@ void fillHistos::Loop()
     fChain->SetBranchStatus("run", 1);
     fChain->SetBranchStatus("lumi", 1);
 
+    fChain->SetBranchStatus("met", 1);
+    fChain->SetBranchStatus("sumet", 1);
+
     if (_jp_doBasicHistos) {
+	
+	initBasics("NoEventSelection");
+	
         initBasics("Standard");
     }
-    
+
+   TDirectory *curdir = _outfile->GetDirectory("NoEventSelection"); assert(curdir);
+
+ // met/sumet
+   curdir->mkdir("MetSumetRatio");
+   assert(curdir->cd("MetSumetRatio") && "Error while creating directory");
+
+   TDirectory *ydir = curdir->GetDirectory("MetSumetRatio");
+   assert(ydir);         
+   ydir->cd();
+
+   TH1F *leq100 = new TH1F("leq100", "met/sumet for jet_pt[0]  with pt less than 100", 50, 0, 1);
+   TH1F *geq500 = new TH1F("geq500", "met/sumet for jet_pt[0]  with pt greater than 500", 50, 0, 1);
+   TH1F *rest = new TH1F("rest", "met/sumet for jet_pt[0]  with pt greater than 100 and less than 500", 50, 0, 1);
+
     // Event loop
     for (Long64_t jentry=0; jentry < nentries;jentry++) {
 
@@ -64,11 +84,38 @@ void fillHistos::Loop()
         // Read event
         fChain->GetEntry(jentry);
 
+        if (jet_pt[0] <= 100) {
+
+		leq100->Fill(met/sumet);
+
+	} else if (jet_pt[0] >= 500) {
+
+		geq500->Fill(met/sumet);
+
+	} else {
+
+		rest->Fill(met/sumet);
+
+	}
+
         // Write this event to histograms
         if (_jp_doBasicHistos) {
-            fillBasics("Standard");
+
+            fillBasics("NoEventSelection");
+	
+	    if (met < 0.3 * sumet) {
+
+	    fillBasics("Standard");
+
+	    }
         }    
     }
+
+    leq100->Write();
+    geq500->Write();
+    rest->Write();
+
+    curdir->cd();
         
     // Delete histograms and close file properly
     if (_jp_doBasicHistos) {
@@ -85,7 +132,7 @@ void fillHistos::initBasics(std::string name) {
     TDirectory *curdir = gDirectory;
 
     // Create output file
-    TFile *f = (_outfile ? _outfile: new TFile(Form("output-%s-1.root", _type.c_str()), "RECREATE"));
+    TFile *f = (_outfile ? _outfile: new TFile(Form("outputs/output-%s-1.root", _type.c_str()), "RECREATE"));
     
     // Safety check
     assert(f && !f->IsZombie() && "Error while creating output file!");
@@ -123,7 +170,6 @@ void fillHistos::initBasics(std::string name) {
         
         pttrg[trg] = pt0;
     }
-
 
     // Read first entry from the TTree to get trigger names 
     fChain->GetEntry(0);
@@ -174,8 +220,7 @@ void fillHistos::initBasics(std::string name) {
     _outfile = f;
     curdir->cd();
 
-} 
-
+}
 
 // Loop over the histograms of the container and fill them
 void fillHistos::fillBasics(std::string name) {
@@ -226,7 +271,7 @@ void fillHistos::fillBasic(basicHistos *h) {
 
     // Loop over jets of this event
     for (unsigned int i = 0; i != njet; ++i) {
-        
+ 
         if (_debug) {
            std::cout << "Loop over jet " << i << "/" << njet << endl;
         }
