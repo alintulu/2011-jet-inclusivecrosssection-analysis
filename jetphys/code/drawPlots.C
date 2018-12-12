@@ -173,7 +173,7 @@ void drawEtaSpectra(string folder) {
 	gPad->SetLogx();
 	gPad->RedrawAxis();	
 
-	c1->SaveAs("eta_spectra.pdf");
+	c1->SaveAs(Form("../plots/eta_spectra_%s.pdf",folder.c_str()));
 
 } //drawEtaSpectra
 
