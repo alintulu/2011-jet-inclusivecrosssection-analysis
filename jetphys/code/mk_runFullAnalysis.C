@@ -62,12 +62,12 @@ pixelLumiCalc.py -i Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt -o
     // Step 2c:  - reformat theory curves
     std::cout << "\nStep 2c: Reformat theory predictions"
        << "\n======================================\n";
-    //  gROOT->ProcessLine(".x mk_theory.C");
+    //gROOT->ProcessLine(".x mk_theory.C");
 
     // Step 3: - unfold spectrum using d'Agostini method
     std::cout << "\nStep 3: Unfold spectrum using d'Agostini method"
        << "\n===================================================\n";
-    //gROOT->ProcessLine(".x mk_dagostini.C");
+     gROOT->ProcessLine(".x mk_dagostini.C");
 
 
     // Step 6:  - produce pretty plots of analysis steps

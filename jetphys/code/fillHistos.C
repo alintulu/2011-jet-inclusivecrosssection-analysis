@@ -312,48 +312,48 @@ void fillHistos::writeBasics() {
 // Load luminosity information
 void fillHistos::loadLumi(const std::string filename) {
 
-    // Open luminosity file
-    std::ifstream CSVfile(filename);
-    assert(CSVfile.is_open() && "Error while opening luminosity file!");
+  // Open luminosity file
+  std::ifstream CSVfile(filename);
+  assert(CSVfile.is_open() && "Error while opening luminosity file!");
 
-    // Read header
-    std::string header;
-    getline(CSVfile, header, '\r');
-    std::cout << "CSV header: " << header << std::endl;
+  // Read header
+  std::string header;
+  getline(CSVfile, header, '\r');
+  std::cout << "CSV header: " << header << std::endl;
     
-    // Require proper header format
-    assert(header == string("Run:Fill,LS,UTCTime,Beam Status,E(GeV),Delivered(/ub),Recorded(/ub),avgPU"));
+  // Require proper header format
+  assert(header == string("Run:Fill,LS,UTCTime,Beam Status,E(GeV),Delivered(/ub),Recorded(/ub),avgPU"));
     
-    // Total number of lumisections
-    int nls = 0;
+  // Total number of lumisections
+  int nls = 0;
 
-    // Total recorded luminosity
-    double lumsum = 0;
+  // Total recorded luminosity
+  double lumsum = 0;
 
-    // One line of the file
-    std::string line;
-    while ( getline(CSVfile, line, '\r') ) {
+  // One line of the file
+  std::string line;
+  while ( getline(CSVfile, line, '\r') ) {
 
-        double rec;      // Recorded lumi in microbarns (ub)        
-        unsigned int rn; // Run number
-        unsigned int ls; // Lumisection number
+    double rec;      // Recorded lumi in microbarns (ub)        
+    unsigned int rn; // Run number
+    unsigned int ls; // Lumisection number
 
-        // Parse one line
-        sscanf(line.c_str(),"%d:%*d,%d:%*d,%*d/%*d/%*d %*d:%*d:%*d,STABLE BEAMS,%*f,%*f,%lf,%*f", &rn, &ls, &rec);
+    // Parse one line
+    sscanf(line.c_str(),"%d:%*d,%d:%*d,%*d/%*d/%*d %*d:%*d:%*d,STABLE BEAMS,%*f,%*f,%lf,%*f", &rn, &ls, &rec);
         
-        double lum = rec*1e-6;  // Convert ub to pb
-        _lums[rn][ls] = lum;    // Save lumi section luminosity
-        lumsum += lum;          // Add to luminosity sum 
+    double lum = rec*1e-6;  // Convert ub to pb
+    _lums[rn][ls] = lum;    // Save lumi section luminosity
+    lumsum += lum;          // Add to luminosity sum 
 
-        ++nls;
-	assert(nls < 10e8 && "Error while reading luminosity info!");  
-    }
+    ++nls;
+    assert(nls < 10e8 && "Error while reading luminosity info!");  
+  }
 
-    // Summary
-    std::cout << "Called loadLumi(\"" << filename << "\"):" << endl;
-    std::cout << "Loaded " << _lums.size() << " runs with "
-              << nls << " lumi sections containing "
-              << lumsum << " pb-1 of data " << std::endl;
-    std::cout << "This corresponds to " << nls*23.3/3600
-              << " hours of data-taking" << endl;
+  // Summary
+  std::cout << "Called loadLumi(\"" << filename << "\"):" << endl;
+  std::cout << "Loaded " << _lums.size() << " runs with "
+	    << nls << " lumi sections containing "
+	    << lumsum << " pb-1 of data " << std::endl;
+  std::cout << "This corresponds to " << nls*23.3/3600
+	    << " hours of data-taking" << endl;
 } 

@@ -16,7 +16,7 @@
 #include "TF1.h"
 #include "TMath.h"
 #include "TGraphErrors.h"
-
+#include "TCanvas.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -110,6 +110,17 @@ void theory(string type) {
 
 void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
 
+    double xmaxeta = 2500;
+    double xmineta = 0;
+    TH1D *h = new TH1D("h","",int(xmaxeta-xmineta),xmineta,xmaxeta);
+    h->SetMinimum(1e-5);
+    h->SetMaximum(1e14);
+    h->GetYaxis()->SetTitle("d^{2}#sigma/dp_{T}dy (pb/GeV)");
+    h->GetXaxis()->SetTitle("Jet p_{T} (GeV)");
+
+    TCanvas *c1 = new TCanvas("c1","c1");
+    h->Draw("AXIS");
+
     float etamin = 0;
     float etamax = 0;
     sscanf(din->GetName(), "Eta_%f-%f", &etamin, &etamax);
@@ -145,7 +156,9 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
     fnlo->FixParameter(4, 0.5 * ieta);
 
     hnlo = hmc;
-    hnlo->Fit(fnlo, "QRN");
+    hnlo->Fit("fnlo");
+    hnlo->FindObject("fnlo")->Draw("SAMEP");
+
 
     // Graph of theory points with centered bins
     const double minerr = 0.02;
@@ -174,7 +187,7 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
         }
     }
 
-    gnlo2->Fit(fnlo, "QRN");
+    //gnlo2->Fit(fnlo, "QEN");
 
     // Divide graph with fit to check stability
     TGraphErrors *gnlofit = new TGraphErrors(0);
