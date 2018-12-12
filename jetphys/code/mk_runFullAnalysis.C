@@ -47,7 +47,7 @@ pixelLumiCalc.py -i Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt -o
     //         (- for MC include generator truth information for analysis closure)
     std::cout << "\nStep 1: Histogram measured jet pt and correction factors"
         << "\n========================================================\n";
-    gROOT->ProcessLine(".x mk_fillHistos.C");
+    //gROOT->ProcessLine(".x mk_fillHistos.C");
  
     // Step 2a: - apply corrections, normalize luminosity and eta width
     std::cout << "\nStep 2a: Apply corrections and normalization factors"
@@ -62,32 +62,18 @@ pixelLumiCalc.py -i Cert_160404-180252_7TeV_ReRecoNov08_Collisions11_JSON.txt -o
     // Step 2c:  - reformat theory curves
     std::cout << "\nStep 2c: Reformat theory predictions"
        << "\n======================================\n";
-    //gROOT->ProcessLine(".x mk_theory.C");
+    gROOT->ProcessLine(".x mk_theory.C");
 
     // Step 3: - unfold spectrum using d'Agostini method
     std::cout << "\nStep 3: Unfold spectrum using d'Agostini method"
        << "\n===================================================\n";
-     gROOT->ProcessLine(".x mk_dagostini.C");
+    gROOT->ProcessLine(".x mk_dagostini.C");
 
 
     // Step 6:  - produce pretty plots of analysis steps
     std::cout << "\nStep 6: Draw plots (raw spectra, triggers, unfolding)"
        << "\n=====================================================\n";
-    ///gROOT->ProcessLine(".x mk_drawPlots.C");
-
-    // Step 7: - plot systematics
-    std::cout << "\nStep 7: Draw plots (systematics)"
-       << "\n================================\n";
-    //gROOT->ProcessLine(".x mk_drawSystematics.C");
-
-    // Step 8: - plot summary
-    std::cout << "\nStep 8: Draw plots (summary)"
-       << "\n================================\n";
-
-    // Step 9: - plot summary
-    std::cout << "\nStep 9a: Draw plots (comparison)"
-       << "\n================================\n";
-    //gROOT->ProcessLine(".x mk_drawComparison.C");
+    //gROOT->ProcessLine(".x drawPlots.C");
 
     // Get pixellumi_by_LS.csv file with pixelLumiCalc.py (new, Feb22)
     // --------------------------------------------------
