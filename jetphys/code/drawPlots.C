@@ -23,7 +23,7 @@ void drawEtaSpectra(string folder);
 void drawJetsPerBin();
 void drawMetSumetRatio();
 
-void drawPlots2() {
+void drawPlots() {
 
 	drawEtaSpectra("Standard");
 	drawJetsPerBin();

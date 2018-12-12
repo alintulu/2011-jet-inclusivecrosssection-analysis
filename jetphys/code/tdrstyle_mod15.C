@@ -241,10 +241,10 @@ void setTDRStyle() {
 // Global variables
 //
 
-TString cmsText     = "CMS";
+TString cmsText     = "";
 float cmsTextFont   = 61;  // default is helvetic-bold
 
-bool writeExtraText = true;//false;
+bool writeExtraText = false;//false;
 TString extraText   = "Preliminary";
 TString extraText2   = ""; // For Simulation Preliminary on two lines
 float extraTextFont = 52;  // default is helvetica-italics
@@ -488,7 +488,7 @@ TCanvas* tdrCanvas(const char* canvName, TH1D *h,
   // references for T, B, L, R
   float T = (square ? 0.07*H_ref : 0.08*H_ref);
   float B = (square ? 0.13*H_ref : 0.12*H_ref); 
-  float L = (square ? 0.15*W_ref : 0.12*W_ref);
+  float L = (square ? 0.18*W_ref : 0.12*W_ref);
   float R = (square ? 0.05*W_ref : 0.04*W_ref);
 
   TCanvas *canv = new TCanvas(canvName,canvName,50,50,W,H);
