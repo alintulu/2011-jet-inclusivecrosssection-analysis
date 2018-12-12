@@ -39,7 +39,7 @@ void combineHistos(std::string type) {
 
     // Input file: normalized pT spectra
     TFile *fin = 
-        new TFile(Form("outputs/output-%s-2a.root", type.c_str()), "READ");
+        new TFile(Form("../outputs/output-%s-2a.root", type.c_str()), "READ");
     assert(fin && !fin->IsZombie());
     
     // Top-level directory
@@ -47,7 +47,7 @@ void combineHistos(std::string type) {
 
     // Output file: combined spectra 
     TFile *fout =
-        new TFile(Form("outputs/output-%s-2b.root", type.c_str()), "RECREATE");
+        new TFile(Form("../outputs/output-%s-2b.root", type.c_str()), "RECREATE");
     assert(fout && !fout->IsZombie());
 
 

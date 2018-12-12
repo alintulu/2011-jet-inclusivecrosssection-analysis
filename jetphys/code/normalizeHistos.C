@@ -31,11 +31,11 @@ void normalizeHistos(string type) {
     _dt = (type=="DATA");
 
     // Input file
-    TFile *fin = new TFile(Form("outputs/output-%s-1.root",type.c_str()),"READ");
+    TFile *fin = new TFile(Form("../outputs/output-%s-1.root",type.c_str()),"READ");
     assert(fin && !fin->IsZombie());
 
     // Output file
-    TFile *fout = new TFile(Form("outputs/output-%s-2a.root",type.c_str()),"RECREATE");
+    TFile *fout = new TFile(Form("../outputs/output-%s-2a.root",type.c_str()),"RECREATE");
     assert(fout && !fout->IsZombie());
 
     std::cout << "Calling normalizeHistos("<< type <<");" << std::endl;
@@ -78,13 +78,16 @@ void recurseFile(TDirectory *indir, TDirectory *outdir,
     while ( (key = itkey.Next()) ) {
 
         if (_debug) 
-            std::cout << key->GetName() << std::endl << flush;
+        	std::cout << key->GetName() << std::endl << flush;
     
         obj = ((TKey*)key)->ReadObj(); assert(obj);
         dir = indir;
-    
+   
+	string *fileName = new string(key->GetName());
+
         // Found a subdirectory: copy it to output and go deeper
-        if (obj->InheritsFrom("TDirectory")) {
+        if (!(fileName->compare("MetSumetRatio") == 0) && obj->InheritsFrom("TDirectory")) {
+
 
             outdir->mkdir(obj->GetName());            
             assert(outdir->cd(obj->GetName()));
