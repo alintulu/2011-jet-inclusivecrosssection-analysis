@@ -24,6 +24,7 @@
 #include "RooUnfold/src/RooUnfoldBinByBin.h"
 #include "RooUnfold/src/RooUnfoldSvd.h"
 #include "RooUnfold/src/RooUnfoldResponse.h"
+//#include "RooUnfold.h"
 
 #include "tdrstyle_mod15.C"
 #include "ptresolution.h"
@@ -100,14 +101,14 @@ void dagostiniUnfold_histo(TH1D *hpt, TH1D *hpt2, TDirectory *outdir,
 
 void dagostiniUnfold(string type) {
 
-  TFile *fin = new TFile(Form("outputs/output-%s-2b.root",type.c_str()),"READ");
+  TFile *fin = new TFile(Form("../outputs/output-%s-2b.root",type.c_str()),"READ");
   assert(fin && !fin->IsZombie());
 
   //TFile *fin2 = new TFile(Form("outputs/output-%s-2c.root",type.c_str()),"READ");
-  TFile *fin2 = new TFile(Form("outputs/output-%s-2c.root","MC"),"READ");
+  TFile *fin2 = new TFile(Form("../outputs/output-%s-2c.root","MC"),"READ");
   assert(fin2 && !fin2->IsZombie());
 
-  TFile *fout = new TFile(Form("outputs/output-%s-3.root",type.c_str()),"RECREATE");
+  TFile *fout = new TFile(Form("../outputs/output-%s-3.root",type.c_str()),"RECREATE");
   assert(fout && !fout->IsZombie());
 
   _ak7 = (_jp_algo=="AK7");
@@ -430,8 +431,8 @@ void dagostiniUnfold_histo(TH1D *hpt, TH1D *hnlo, TDirectory *outdir,
     for (int i = 1; i != mts->GetNbinsX()+1; ++i) {
       for (int j = 1; j != mts->GetNbinsY()+1; ++j) {
 
-	double x = mts->GetBinCenter(i);
-	double y = mts->GetBinCenter(j);
+	double x = mts->GetXaxis()->GetBinCenter(i);
+	double y = mts->GetYaxis()->GetBinCenter(j);
 	int i2 = mt->GetXaxis()->FindBin(x);
 	int j2 = mt->GetYaxis()->FindBin(y);
 	mts->SetBinContent(i, j, mt->GetBinContent(i2, j2));
@@ -441,7 +442,7 @@ void dagostiniUnfold_histo(TH1D *hpt, TH1D *hnlo, TDirectory *outdir,
 
     for (int i = 1; i != mxs->GetNbinsX()+1; ++i) {
 
-      double x = mxs->GetBinCenter(i);
+      double x = mxs->GetXaxis()->GetBinCenter(i);
       int i2 = mx->FindBin(x);
       mxs->SetBinContent(i, mx->GetBinContent(i2));
       mxs->SetBinError(i, mx->GetBinError(i2));
@@ -771,7 +772,7 @@ void drawDagostini(string type) {
   TDirectory *curdir = gDirectory;
   setTDRStyle();
 
-  TFile *f = new TFile(Form("outputs/output-%s-3.root",type.c_str()),"READ");
+  TFile *f = new TFile(Form("../outputs/output-%s-3.root",type.c_str()),"READ");
   assert(f && !f->IsZombie());
 
   assert(f->cd("Standard"));
@@ -978,27 +979,30 @@ void drawDagostini(string type) {
   const char *a = _jp_algo.c_str();
   const char *t = type.c_str();
 
+  gROOT->SetBatch(kTRUE);
+
   c1->cd(3);
   tex->SetTextSize(0.045);
   tex->SetNDC(kTRUE);
   tex->DrawLatex(0.35, 0.85, Form("%s %s",t,a));
   c1->cd(0);
   //cmsPrel(type=="DATA" ? _lumi : 0, true);
-  c1->SaveAs(Form("pdf/roounfold_matrix_%s_%s.pdf",a,t));
-  c1b->SaveAs(Form("pdf/roounfold_matrix0_%s_%s.pdf",a,t));
+  c1->SaveAs(Form("../plots/roounfold_matrix_%s_%s.pdf",a,t));
+  c1b->SaveAs(Form("../plots/roounfold_matrix0_%s_%s.pdf",a,t));
 
   c2->cd(2);
   tex->SetTextSize(0.053);
   tex->DrawLatex(0.50, 0.85, Form("%s %s",t,a));
   c2->cd(0);
   //cmsPrel(type=="DATA" ? _jp_lumi : 0, true);
-  c2->SaveAs(Form("pdf/roounfold_comparison_%s_%s.pdf",a,t));
+  c2->SaveAs(Form("../plots/roounfold_comparison_%s_%s.pdf",a,t));
 
   c3->cd(2);
   tex->DrawLatex(0.50, 0.85, Form("%s %s",t,a));
   c3->cd(0);
   //cmsPrel(type=="DATA" ? _jp_lumi : 0, true);
-  c3->SaveAs(Form("pdf/roounfold_ratiotofwd_%s_%s.pdf",a,t));
+  c3->SaveAs(Form("../plots/roounfold_ratiotofwd_%s_%s.pdf",a,t));
   
+  gROOT->SetBatch(kFALSE);
 
 } // drawDagostini

@@ -16,7 +16,7 @@
 #include "TF1.h"
 #include "TMath.h"
 #include "TGraphErrors.h"
-#include "TCanvas.h"
+
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -40,27 +40,49 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout);
 // Also load old experimental data
 void dataBin(TDirectory *din, TDirectory *dout);
 
+void theory2(string type, string dir, TDirectory *fin, TDirectory *fmc, TDirectory *fout);
+
 void theory(string type) {
+
+    TDirectory *curdir = gDirectory;
+
     // TFile *fin = new TFile(Form("outputs/output-%s-3a.root",type.c_str()),"READ");
-    TFile *fin = new TFile(Form("outputs/output-%s-2b.root", type.c_str()), "READ");
+    TFile *fin = new TFile(Form("../outputs/output-%s-2b.root", type.c_str()), "READ");
     assert(fin && !fin->IsZombie());
 
     // LO Pythia MC prediction
-    TFile *fmc = new TFile("outputs/output-MC-2b.root", "READ");
+    TFile *fmc = new TFile("../outputs/output-MC-2b.root", "READ");
     assert(fmc && !fmc->IsZombie());
 
-    TFile *fout = new TFile(Form("outputs/output-%s-2c.root", type.c_str()), "RECREATE");
+    // Output
+    TFile *fout = new TFile(Form("../outputs/output-%s-2c.root", type.c_str()), "RECREATE");
     assert(fout && !fout->IsZombie());
 
+    theory2(type, "Standard", fin, fmc, fout);   
+    curdir->cd();
+    theory2(type, "NoEventSelection", fin, fmc, fout);   
+
+    fout->Write();
+    fout->Close();
+    fout->Delete();
+
+    fin->Close();
+    fin->Delete();
+
+    fmc->Close();
+}
+
+void theory2(string type, string dir, TDirectory *fin, TDirectory *fmc, TDirectory *fout) {
+
     // Select top category
-    fin->cd("Standard");
+    fin->cd(dir.c_str());
     TDirectory *din0 = gDirectory;
 
-    fmc->cd("Standard");
+    fmc->cd(dir.c_str());
     TDirectory *dmc0 = gDirectory;
 
-    fout->mkdir("Standard");
-    fout->cd("Standard");
+    fout->mkdir(dir.c_str());
+    fout->cd(dir.c_str());
     TDirectory *dout0 = gDirectory;
 
     // Automatically go through the list of keys (directories)
@@ -96,30 +118,11 @@ void theory(string type) {
     }     // while
 
     cout << "Output stored in " << fout->GetName() << endl;
-    fout->Write();
-    fout->Close();
-    fout->Delete();
-
-    fin->Close();
-    fin->Delete();
-
-    fmc->Close();
 
 } // theory
 
 
 void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
-
-    double xmaxeta = 2500;
-    double xmineta = 0;
-    TH1D *h = new TH1D("h","",int(xmaxeta-xmineta),xmineta,xmaxeta);
-    h->SetMinimum(1e-5);
-    h->SetMaximum(1e14);
-    h->GetYaxis()->SetTitle("d^{2}#sigma/dp_{T}dy (pb/GeV)");
-    h->GetXaxis()->SetTitle("Jet p_{T} (GeV)");
-
-    TCanvas *c1 = new TCanvas("c1","c1");
-    h->Draw("AXIS");
 
     float etamin = 0;
     float etamax = 0;
@@ -156,9 +159,7 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
     fnlo->FixParameter(4, 0.5 * ieta);
 
     hnlo = hmc;
-    hnlo->Fit("fnlo");
-    hnlo->FindObject("fnlo")->Draw("SAMEP");
-
+    hnlo->Fit(fnlo, "QRN");
 
     // Graph of theory points with centered bins
     const double minerr = 0.02;
@@ -187,7 +188,7 @@ void theoryBin(TDirectory *din, TDirectory *dth, TDirectory *dout) {
         }
     }
 
-    //gnlo2->Fit(fnlo, "QEN");
+    gnlo2->Fit(fnlo, "QRN");
 
     // Divide graph with fit to check stability
     TGraphErrors *gnlofit = new TGraphErrors(0);
