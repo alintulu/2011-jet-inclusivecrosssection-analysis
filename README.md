@@ -4,14 +4,14 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
 ## Prerequisites
 
   * This script only works with [ROOT6](https://root.cern.ch/downloading-root)
-  * Before you run anything you need to 1) while in directory [jetphys](jetphys) create an empty directory called plots 2) while in directory [code](jetphys/code) checkout and compile the tool RooUnfold which will help you unfold the data with the macro [dagostini.C](jetphys/code/dagostini.C)
+  * Before you run anything you need to 1) while in directory [jetphys](jetphys) create an empty directory called plots, this is where the ouput plots will go. 2) While in directory [code](jetphys/code) checkout and build the framework [RooUnfold](http://hepunx.rl.ac.uk/~adye/software/unfold/RooUnfold.html) which will help you unfold the data with the macro [dagostini.C](jetphys/code/dagostini.C)
 
   1. Create directory plots
   
     $ cd jetphys
     $ mkdir plots
     
-  2. Checkout and compile RooUnfold
+  2. Checkout and build RooUnfold
   
     $ cd code
     $ svn co https://svnsrv.desy.de/public/unfolding/RooUnfold/trunk RooUnfold
@@ -24,7 +24,7 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
   
   1. Running full analysis
   
-  If you want to run the code with data, change nothing. If you want to run the code with MC, go to [settings.h line 25](https://github.com/alintulu/2011-jet-inclusivecrosssection-analysis/blob/master/jetphys/code/settings.h#L25) and change 
+  You can run the code with either data or Monte Carlo samples as input. If you want to run the code with data, change nothing. If you want to run the code with MC, go to [settings.h line 25](https://github.com/alintulu/2011-jet-inclusivecrosssection-analysis/blob/master/jetphys/code/settings.h#L25) and change 
 
   ```
   std::string _jp_type = "DATA"
@@ -32,6 +32,7 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
   to
   ```
   std::string _jp_type = "MC"
+  
   ```
   When you are happy with the settings, while in the directory [code](jetphys/code) run
 
@@ -40,7 +41,7 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
   ```
   2. Run parts of the analysis
   
-  Either comment out the parts you don't want to run in [mk_runFullAnalysis.C](jetphys/code/mk_runFullAnalysis.C) or simply choose one make file (exempel [mk_normalizeHistos.C](jetphys/code/mk_normalizeHistos.C))
+  Either comment out the parts you don't want to run in [mk_runFullAnalysis.C](jetphys/code/mk_runFullAnalysis.C) or simply choose one make file to run (exempel [mk_normalizeHistos.C](jetphys/code/mk_normalizeHistos.C))
   
   ```
   $ root -l -b -q mk_normalizeHistos.C
@@ -69,9 +70,9 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
   /QCD_Pt-800to1000_TuneZ2_7TeV_pythia6/Summer11LegDR-PU_S13_START53_LV6-v1/AODSIM
   ```
 
-## Explanation of variables in the output root files
+## Variables of output root files
 
- * In `output-<DATA/MC>-1/2a/2b.root`
+ * In `output-DATA/MC-1/2a/2b.root`
 
 ```
 hpt = raw pT spectrum
@@ -80,18 +81,18 @@ hlumi (only for data, for MC hlumi = 1) = effective luminosity
 hpt_g0tw (only for MC) = unbiased generator spectrum (needed for unfolding)
 ```
 
- * In `output-<DATA/MC>-2c.root`
+ * In `output-DATA/MC-2c.root`
 
 ```
 gnlo = graph of theory points with centered bins
-gnlocut = -||- but only up to expected pT
-gnlofit = -||- but graph is divided with fit to check stability
+gnlocut = graph of theory points with centered bins but only up to expected pT
+gnlofit = graph of theory points with centered bins but graph is divided with fit to check stability
 fnlo = initial fit of NLO curve
 hnlo = generated spectrum fitted to the NLO curve
 ```
 
 
- * In `output-<DATA/MC>-3.root`
+ * In `output-DATA/MC-3.root`
 
 ```
 grcorrpt = graph of corrected pt
