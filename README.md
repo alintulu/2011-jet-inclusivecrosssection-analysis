@@ -7,18 +7,18 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
   * Before you run anything you need to 1) while in directory [jetphys](jetphys) create an empty directory called plots, this is where the ouput plots will go. 2) While in directory [code](jetphys/code) checkout and build the framework [RooUnfold](http://hepunx.rl.ac.uk/~adye/software/unfold/RooUnfold.html) which will help you unfold the data with the macro [dagostini.C](jetphys/code/dagostini.C)
 
   1. Create directory plots
-  
+  ```
     $ cd jetphys
     $ mkdir plots
-    
+  ```
   2. Checkout and build RooUnfold
-  
+  ```
     $ cd code
     $ svn co https://svnsrv.desy.de/public/unfolding/RooUnfold/trunk RooUnfold
     $ cd RooUnfold
     $ make
     $ cd ..
-    
+  ```  
   
   ## Running the analysis
   
@@ -73,43 +73,37 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
 ## Variables of output root files
 
  * In `output-DATA/MC-1/2a/2b.root`
-
-```
-hpt = raw pT spectrum
-hpt_pre (only for data) = prescaled pT spectrum
-hlumi (only for data, for MC hlumi = 1) = effective luminosity
-hpt_g0tw (only for MC) = unbiased generator spectrum (needed for unfolding)
-```
-
+  ```
+  hpt = raw pT spectrum
+  hpt_pre (only for data) = prescaled pT spectrum
+  hlumi (only for data, for MC hlumi = 1) = effective luminosity
+  hpt_g0tw (only for MC) = unbiased generator spectrum (needed for unfolding)
+  ```
  * In `output-DATA/MC-2c.root`
-
-```
-gnlo = graph of theory points with centered bins
-gnlocut = graph of theory points with centered bins but only up to expected pT
-gnlofit = graph of theory points with centered bins but graph is divided with fit to check stability
-fnlo = initial fit of NLO curve
-hnlo = generated spectrum fitted to the NLO curve
-```
-
-
+  ```
+  gnlo = graph of theory points with centered bins
+  gnlocut = graph of theory points with centered bins but only up to expected pT
+  gnlofit = graph of theory points with centered bins but graph is divided with fit to check stability
+  fnlo = initial fit of NLO curve
+  hnlo = generated spectrum fitted to the NLO curve
+  ```
  * In `output-DATA/MC-3.root`
-
-```
-grcorrpt = graph of corrected pt
-hcoorpt = histogram of corrected pt
-gfold = "unfolding corrections" (unfolded / original)
-fus = initial fit of the NLO curve
-fs = smeared theory curve
-fres = resolution function
-grationlo = NLO ratio to unsmeared fit
-gratio = data ratio to (smeared) fit
-hreco = copy over relevant part of hpt
-htrue = copy of relevant part of hnlo
-mt = response matrix, measured X truth
-my = measured projections of response to X-axis
-mx = truth projections of response to Y-axis
-hCov = unfolding covariance matrix
-```
+  ```
+  grcorrpt = graph of corrected pt
+  hcoorpt = histogram of corrected pt
+  gfold = "unfolding corrections" (unfolded / original)
+  fus = initial fit of the NLO curve
+  fs = smeared theory curve
+  fres = resolution function
+  grationlo = NLO ratio to unsmeared fit
+  gratio = data ratio to (smeared) fit
+  hreco = copy over relevant part of hpt
+  htrue = copy of relevant part of hnlo
+  mt = response matrix, measured X truth
+  my = measured projections of response to X-axis
+  mx = truth projections of response to Y-axis
+  hCov = unfolding covariance matrix
+  ```
 
 ## Ouput plots
 
@@ -121,7 +115,7 @@ hCov = unfolding covariance matrix
 
 * `jets_per_bin.pdf`
 
-  Graph to illustrate the number of jets detected by the triggers. There is no specific reason for some curves being filled other than to show the structure of curve. The shaded area of the filled curves indicate where the different triggers will be stitched together. In the macro [combineHistos.C](jetphys/code/combineHistos.C) jets from the shaded area of one trigger histogram will be stitched together with jets from the other shaded areas to form one histogram.
+  Graph to illustrate the number of jets detected by the triggers. There is no specific reason for some curves being filled other than to show the structure of curve. The shaded area of the filled curves indicate where the different triggers will be stitched together. In the macro [combineHistos.C](jetphys/code/combineHistos.C) jets from the shaded area of one trigger histogram will be stitched together with jets from the other shaded areas of other trigger histograms to form one complete histogram.
   
 * `roounfold_comparison_AK5_DATA.pdf`
 
