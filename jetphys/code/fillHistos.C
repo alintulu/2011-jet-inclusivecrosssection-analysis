@@ -132,7 +132,7 @@ void fillHistos::initBasics(std::string name) {
     TDirectory *curdir = gDirectory;
 
     // Create output file
-    TFile *f = (_outfile ? _outfile: new TFile(Form("outputs/output-%s-1.root", _type.c_str()), "RECREATE"));
+    TFile *f = (_outfile ? _outfile: new TFile(Form("../outputs/output-%s-1.root", _type.c_str()), "RECREATE"));
     
     // Safety check
     assert(f && !f->IsZombie() && "Error while creating output file!");
