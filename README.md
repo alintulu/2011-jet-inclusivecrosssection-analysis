@@ -76,7 +76,7 @@ Validation code for 2011 jet dataset, based on inclusive jet cross section - ste
 
 ```
 hpt = raw pT spectrum
-hpt_pre = prescaled pT spectrum
+hpt_pre (only for data) = prescaled pT spectrum
 hlumi (only for data, for MC hlumi = 1) = effective luminosity
 hpt_g0tw (only for MC) = unbiased generator spectrum (needed for unfolding)
 ```
@@ -110,3 +110,29 @@ my = measured projections of response to X-axis
 mx = truth projections of response to Y-axis
 hCov = unfolding covariance matrix
 ```
+
+## Ouput plots
+
+* `met_sumet_ratio_of_different_pt_events.pdf`
+
+  Graph explaining the cut made at [line 106 in fillHistos.C](https://github.com/alintulu/2011-jet-inclusivecrosssection-analysis/blob/master/jetphys/code/fillHistos.C#L106). For jets with higher pT [FILL]
+
+* `eta_spectra.pdf`
+
+* `jets_per_bin.pdf`
+
+  Graph to illustrate the number of jets detected by the triggers. There is no specific reason for some curves being filled other than to show the structure of curve. The shaded area of the filled curves indicate where the different triggers will be stitched together. In the macro [combineHistos.C](jetphys/code/combineHistos.C) jets from the shaded area of one trigger histogram will be stitched together with jets from the other shaded areas to form one histogram.
+  
+* `roounfold_comparison_AK5_DATA.pdf`
+
+  Comparison of different unfolding methods
+  
+* `roounfold_matrix_AK5_DATA.pdf`
+
+  Unfolding matrix for different eta intervals
+  
+* `roounfold_matrix0_AK5_DATA.pdf`
+
+  Unfolding matrix for |y|<0.5
+  
+* `roounfold_ratiotofwd_AK5_DATA.pdf`
